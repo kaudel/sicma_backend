@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sicma.DataAccess\Sicma.DataAccess.csproj" />
-    <ProjectReference Include="..\Sicma.Service\Sicma.Service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,10 @@
 
 using Microsoft.EntityFrameworkCore;
 using Sicma.DataAccess.Context;
+using Sicma.Repositorys.Implementations;
+using Sicma.Repositorys.Interfaces;
+using Sicma.Service.Implementations;
+using Sicma.Service.Interfaces;
 
 namespace Sicma.API
 {
@@ -19,6 +23,10 @@ namespace Sicma.API
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DBSicma"));
             });
+
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
             builder.Services.AddOpenApi();
 
             var app = builder.Build();

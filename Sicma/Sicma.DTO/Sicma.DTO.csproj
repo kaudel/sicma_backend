@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Sicma.DTO\Sicma.DTO.csproj" />
-	<ProjectReference Include="..\Sicma.Repositorys\Sicma.Repositorys.csproj" />
-  </ItemGroup>
-
 </Project>
