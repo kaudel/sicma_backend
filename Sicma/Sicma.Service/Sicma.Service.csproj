@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sicma.Common\Sicma.Common.csproj" />
     <ProjectReference Include="..\Sicma.DTO\Sicma.DTO.csproj" />
 	<ProjectReference Include="..\Sicma.Repositorys\Sicma.Repositorys.csproj" />
   </ItemGroup>

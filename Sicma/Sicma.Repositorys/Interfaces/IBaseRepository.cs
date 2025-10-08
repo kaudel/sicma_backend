@@ -6,11 +6,11 @@ namespace Sicma.Repositorys.Interfaces
     public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     {
         Task<ICollection<TEntity>> GetAllAsync();
-        Task<ICollection<TEntity>> GetAll(Expression<Func<TEntity, bool>> predicate);
+        Task<ICollection<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate);
         Task<ICollection<TResult>> GetAllAsync<TResult>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, TResult>> selector);
-        Task<(ICollection<TResult> collection, int TotalRecords)> GetAllAsync<TResult, TKey>(
+        Task<(ICollection<TResult> Collection, int TotalRecords)> GetAllAsync<TResult, TKey>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, TResult>> selector,
             Expression<Func<TEntity, TKey>> orderBy,

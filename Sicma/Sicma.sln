@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05. Common", "05. Common", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sicma.DTO", "Sicma.DTO\Sicma.DTO.csproj", "{FF745E7B-D920-45FB-A933-BB8D4EE16431}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sicma.Common", "Sicma.Common\Sicma.Common.csproj", "{CA694947-5292-4E83-ACC2-DCF5B8162957}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{FF745E7B-D920-45FB-A933-BB8D4EE16431}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF745E7B-D920-45FB-A933-BB8D4EE16431}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF745E7B-D920-45FB-A933-BB8D4EE16431}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA694947-5292-4E83-ACC2-DCF5B8162957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA694947-5292-4E83-ACC2-DCF5B8162957}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA694947-5292-4E83-ACC2-DCF5B8162957}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA694947-5292-4E83-ACC2-DCF5B8162957}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +83,7 @@ Global
 		{E9160EC9-2F46-4349-84E5-4209D3382B63} = {1FAA6F11-85B8-4709-A4D1-D1518D2B3995}
 		{E585EE04-EF29-43D6-AB3D-4A2C0ACEBAA8} = {22CFC812-99DC-4CBF-9A5F-C97B0AF35C8C}
 		{FF745E7B-D920-45FB-A933-BB8D4EE16431} = {ABE70B5A-B838-4C5A-9434-440EBC72486C}
+		{CA694947-5292-4E83-ACC2-DCF5B8162957} = {ABE70B5A-B838-4C5A-9434-440EBC72486C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C9FF1AF-69C1-4F55-93C7-5B2D7D9914DD}

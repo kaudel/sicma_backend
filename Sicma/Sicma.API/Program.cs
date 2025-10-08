@@ -1,10 +1,15 @@
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Sicma.DataAccess.Context;
 using Sicma.Repositorys.Implementations;
 using Sicma.Repositorys.Interfaces;
 using Sicma.Service.Implementations;
 using Sicma.Service.Interfaces;
+using Sicma.Service.Mappers;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Scalar.AspNetCore;
 
 namespace Sicma.API
 {
@@ -13,11 +18,20 @@ namespace Sicma.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
-            builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            // Add services to the container.
+            builder.Services.AddOpenApi();
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+        
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
+            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+            //FluentValidation
+            //builder.Services.Addf flue AddFluentValidation(fv => {
+
+            //})
 
             builder.Services.AddDbContext<DbsicmaContext>( options => 
             {
@@ -27,7 +41,12 @@ namespace Sicma.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 
-            builder.Services.AddOpenApi();
+            builder.Services.AddAutoMapper(p =>
+            {
+                p.AddProfile<UserMap>();
+            });
+
+            
 
             var app = builder.Build();
 
@@ -35,12 +54,13 @@ namespace Sicma.API
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.MapScalarApiReference();
             }
+            
 
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

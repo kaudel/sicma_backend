@@ -18,13 +18,13 @@ namespace Sicma.Repositorys.Implementations
         public async Task< ICollection<TEntity>> GetAllAsync()
         {
             var result = await dbSicmaContext.Set<TEntity>()
-                                .Where(p => p.IsActive == true)
+                                .Where(p => p.IsActive)
                                 .AsNoTracking()
                                 .ToListAsync();
             return result;
         }
 
-        public async Task<ICollection<TEntity>> GetAll(Expression<Func<TEntity, bool>> predicate)
+        public async Task<ICollection<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate)
         {
             var result = await dbSicmaContext.Set<TEntity>()
                                 .Where(predicate)
@@ -45,7 +45,7 @@ namespace Sicma.Repositorys.Implementations
             return result;
         }
 
-        public async Task<(ICollection<TResult> collection, int TotalRecords)> GetAllAsync<TResult, TKey>(
+        public async Task<(ICollection<TResult> Collection, int TotalRecords)> GetAllAsync<TResult, TKey>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, TResult>> selector,
             Expression<Func<TEntity, TKey>> orderBy,
@@ -54,7 +54,7 @@ namespace Sicma.Repositorys.Implementations
             var result = await dbSicmaContext.Set<TEntity>()
                                 .Where(predicate)
                                 .AsNoTracking()
-                                .OrderBy(selector)
+                                .OrderBy(orderBy)
                                 .Skip((page-1)*rows)
                                 .Take(rows)
                                 .Select(selector)

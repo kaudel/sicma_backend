@@ -1,0 +1,57 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Sicma.DTO.Request.User;
+using Sicma.DTO.Response;
+using Sicma.DTO.Response.Users;
+using Sicma.Service.Interfaces;
+
+namespace Sicma.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+
+        public ICollection<ListUsersResponse> listUsers { get; set; } = new List<ListUsersResponse>();
+        public UserSearchRequest request { get; set; } = new UserSearchRequest();
+
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [HttpPost("Create")]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateUserAsync([FromBody] UserRequest request)
+        {
+            var response = await _userService.Register(request);
+            return response.Success ? Ok(response) : BadRequest(response.Message);
+        }
+
+        [HttpGet("GetAll")]
+        //[ProducesResponseType(typeof(List<>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllUsers([FromQuery]UserSearchRequest request, 
+            CancellationToken cancellationToken = default) 
+        {
+            try
+            {
+                var result = await _userService.GetAll(request);
+                if (result != null && result.Success)
+                {
+                    return Ok(result.Data);
+                }
+                else
+                    return BadRequest(result.Message);
+            }
+            catch (Exception ex)
+            { 
+                return BadRequest(ex);
+            }
+
+        }
+
+        //[HttpGet("users")]
+
+    }
+}
