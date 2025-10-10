@@ -11,6 +11,7 @@ namespace Sicma.Service.Mappers
         {
             CreateMap<UserRequest, User>();
             CreateMap<User, ListUsersResponse>();
+            CreateMap<User, UserResponse>();
         }
     }
 }

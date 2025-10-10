@@ -5,8 +5,6 @@ namespace Sicma.Entities;
 
 public partial class UserType: BaseEntity
 {
-    public int Id { get; set; }
-
     public string UserTypeName { get; set; } = null!;
 
     public string Description { get; set; } = null!;

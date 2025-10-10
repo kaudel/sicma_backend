@@ -20,7 +20,7 @@ namespace Sicma.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost("Create")]
+        [HttpPost]
         //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
         //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateUserAsync([FromBody] UserRequest request)
@@ -31,8 +31,8 @@ namespace Sicma.API.Controllers
 
         [HttpGet("GetAll")]
         //[ProducesResponseType(typeof(List<>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllUsers([FromQuery]UserSearchRequest request, 
-            CancellationToken cancellationToken = default) 
+        public async Task<IActionResult> GetAllUsers([FromQuery] UserSearchRequest request,
+            CancellationToken cancellationToken = default)
         {
             try
             {
@@ -45,13 +45,56 @@ namespace Sicma.API.Controllers
                     return BadRequest(result.Message);
             }
             catch (Exception ex)
-            { 
+            {
                 return BadRequest(ex);
             }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserRequest request)
+        {
+            var result = await _userService.Update(id, request);
+            
+            if (result != null && result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+                return BadRequest(result.Message);
 
         }
 
-        //[HttpGet("users")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById( int id)
+        {
+            try
+            {
+                var result = await _userService.GetById(id);
 
+                if (result != null && result.Success)
+                {
+                    return Ok(result.Data);
+                }
+                else
+                    return BadRequest(result.Message);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var result = await _userService.Delete(id);
+
+            if (result != null && result.Success)
+            {
+                return Ok(result.Message);
+            }
+            else
+                return BadRequest(result.Message);
+
+        }
     }
 }

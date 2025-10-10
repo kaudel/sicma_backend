@@ -58,9 +58,9 @@ namespace Sicma.Service.Implementations
 
                 var result = await _repository.GetAllAsync(
                     predicate: p => p.IsActive 
-                    //&&
-                    //(string.IsNullOrEmpty(request.Institution) || p.Institution.Contains(request.Institution)) &&
-                    //(string.IsNullOrEmpty(request.FullName) || p.FullName.Contains(request.FullName))
+                    &&
+                    (string.IsNullOrEmpty(request.Institution) || p.Institution.Contains(request.Institution)) &&
+                    (string.IsNullOrEmpty(request.FullName) || p.FullName.Contains(request.FullName))
                     ,
                     selector: p => new ListUsersResponse 
                     { 
@@ -90,6 +90,77 @@ namespace Sicma.Service.Implementations
 
             return response;
         }
+
+        public async Task<BaseResponse<UserResponse>> GetById(int id)
+        {
+            var response = new BaseResponse<UserResponse>();
+
+            try
+            {
+                var user = await _repository.FindByIdAsync(id);
+                if (user == null) throw new InvalidDataException("User not found");
+
+                response.Data = _mapper.Map<UserResponse>(user);
+                response.Success = true;
+
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<BaseResponse> Update(int id, UserRequest request)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var user = await _repository.FindByIdAsync(id);
+
+                if (user == null) throw new InvalidDataException("User not exists");
+
+                //do the mapping directly
+                _mapper.Map(request, user);
+                await _repository.UpdateAsync();
+
+                response.Success = true;
+                response.Message = "User updated successfully";
+
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message= ex.Message;
+            }
+            
+            return response;
+        }
+
+        public async Task<BaseResponse> Delete(int id)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var user = await _repository.FindByIdAsync(id);
+                if (user == null) throw new InvalidDataException("User not found");
+
+                await _repository.DeleteAsync(id);
+                response.Success = true;
+                response.Message = "User deleted successfully";
+
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
 
     }
 }

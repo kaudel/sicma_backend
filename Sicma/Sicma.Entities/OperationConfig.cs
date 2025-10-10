@@ -5,8 +5,6 @@ namespace Sicma.Entities;
 
 public partial class OperationConfig:BaseEntity
 {
-    public int Id { get; set; }
-
     public string OperationName { get; set; } = null!;
 
     public string Type { get; set; } = null!;

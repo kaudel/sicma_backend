@@ -28,11 +28,6 @@ namespace Sicma.API
             builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-            //FluentValidation
-            //builder.Services.Addf flue AddFluentValidation(fv => {
-
-            //})
-
             builder.Services.AddDbContext<DbsicmaContext>( options => 
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DBSicma"));
@@ -45,9 +40,7 @@ namespace Sicma.API
             {
                 p.AddProfile<UserMap>();
             });
-
-            
-
+           
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -55,8 +48,7 @@ namespace Sicma.API
             {
                 app.MapOpenApi();
                 app.MapScalarApiReference();
-            }
-            
+            }            
 
             app.UseHttpsRedirection();
 

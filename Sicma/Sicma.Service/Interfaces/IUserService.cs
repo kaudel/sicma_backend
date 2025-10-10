@@ -8,6 +8,9 @@ namespace Sicma.Service.Interfaces
     {
         Task<BaseResponse> Register(UserRequest request);
         Task<PaginationResponse<ListUsersResponse>> GetAll(UserSearchRequest request);
+        Task<BaseResponse> Delete(int id);
+        Task<BaseResponse> Update(int id, UserRequest request);
+        Task<BaseResponse<UserResponse>> GetById(int id);
 
     }
 }
