@@ -1,0 +1,131 @@
+
+https://dbdiagram.io/d
+
+Table users {
+  id integer [primary key]
+  username varchar
+  role varchar
+  fullname varchar
+  email varchar
+  pwd varchar
+  institutionId int
+  isActive bool
+  userTypeId int
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+Table Institutions{
+  id integer [primary key]
+  name varchar
+  isActive bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+Table UserType {
+  id integer [primary key]
+  UserType String
+  isActive bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+Table Classroom {
+  id integer [primary key]
+  name varchar
+  institutionId int 
+  description text [note: 'Content of the post']
+  exerciseId int
+  isActive bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+table Exercise{
+  id int
+  name string
+  description varchar
+  operationConfigId int
+  trainingTypeId  int
+  isActive bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+table OperationConfig{
+  id int [primary key]
+  name string
+  type varctext [note: '- + / *']
+  description varchar
+  elementsItems int
+  digits int
+  range varchar
+  regexExpression varchar
+  timePeriodSeconds int
+  isActive bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+table UserRecord{
+  id int
+  userId int 
+
+  exerciseId int
+  finalScore int 
+  failScore int
+  successScore int
+  isVictory bool 
+  isActive bool
+  finished bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+table TrainingType{
+  id int
+  description text [note: 'training, tournament, 1vs1']
+  isActive bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+table Tournament{
+  id int 
+  name int  
+  description varchar
+  ExerciseId int
+  isActive bool
+  createdBy varchar
+  createdDate timestamp
+  updatedBy varchar
+  updatedDate timestamp
+}
+
+
+ref tournament_classroom: Tournament.ExerciseId > Exercise.id
+Ref user_userType:  users.userTypeId > UserType.id 
+ref user_institution : users.institutionId > Institutions.id
+ref levels_institution : Classroom.institutionId > Institutions.id
+ref clasroomGrade_level: Classroom.exerciseId > Exercise.id
+ref clasroomGrade_operationConfig : Exercise.operationConfigId > OperationConfig.id
+ref userrecord_user : UserRecord.userId > users.id 
+ref exercise_userrecord : Exercise.id > UserRecord.exerciseId 
+ref exercise_trainingtype: Exercise.trainingTypeId > TrainingType.id
