@@ -2,7 +2,7 @@
 {
     public class ListUsersResponse
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string? Nickname { get; set; } = default;
 
         public string? FullName { get; set; } = default;

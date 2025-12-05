@@ -91,7 +91,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<UserResponse>> GetById(int id)
+        public async Task<BaseResponse<UserResponse>> GetById(string id)
         {
             var response = new BaseResponse<UserResponse>();
 
@@ -112,7 +112,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse> Update(int id, UserRequest request)
+        public async Task<BaseResponse> Update(string id, UserRequest request)
         {
             var response = new BaseResponse();
 
@@ -139,7 +139,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse> Delete(int id)
+        public async Task<BaseResponse> Delete(string id)
         {
             var response = new BaseResponse();
 
@@ -160,7 +160,6 @@ namespace Sicma.Service.Implementations
             }
             return response;
         }
-
 
     }
 }

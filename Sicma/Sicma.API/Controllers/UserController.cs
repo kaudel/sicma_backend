@@ -51,7 +51,7 @@ namespace Sicma.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserRequest request)
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UserRequest request)
         {
             var result = await _userService.Update(id, request);
             
@@ -65,7 +65,7 @@ namespace Sicma.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById( int id)
+        public async Task<IActionResult> GetUserById( string id)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace Sicma.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             var result = await _userService.Delete(id);
 

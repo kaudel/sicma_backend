@@ -1,18 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Sicma.Entities
 {
-    public class BaseEntity
+    public class AppUser: IdentityUser 
     {
-        [Key]
-        public string Id { get; set; }
-
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         public DateTime? UpdatedDate { get; set; }
 
-        public string CreatedUserId { get; set; } 
+        public string CreatedUserId { get; set; }
     }
 }

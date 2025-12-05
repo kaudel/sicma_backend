@@ -15,9 +15,9 @@ namespace Sicma.Repositorys.Interfaces
             Expression<Func<TEntity, TResult>> selector,
             Expression<Func<TEntity, TKey>> orderBy,
             int page = 1, int rows = 5);
-        Task<TEntity?> FindByIdAsync(int id);
+        Task<TEntity?> FindByIdAsync(string id);
         Task<TEntity> AddAsync(TEntity entity);
         Task UpdateAsync();
-        Task DeleteAsync(int id);
+        Task DeleteAsync(string id);
     }
 }

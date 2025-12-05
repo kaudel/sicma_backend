@@ -6,9 +6,9 @@ namespace Sicma.Repositorys.Implementations
 {
     public class UserRepository: BaseRepository<User>, IUserRepository
     {
-        protected readonly DbsicmaContext sicmaContext;
+        protected readonly DbSicmaContext sicmaContext;
 
-        public UserRepository(DbsicmaContext context):base(context)
+        public UserRepository(DbSicmaContext context):base(context)
         {
             sicmaContext = context;
         }

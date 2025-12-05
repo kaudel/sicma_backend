@@ -8,9 +8,9 @@ namespace Sicma.Repositorys.Implementations
 {
     public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : BaseEntity
     {
-        protected readonly DbsicmaContext dbSicmaContext;
+        protected readonly DbSicmaContext dbSicmaContext;
 
-        public BaseRepository(DbsicmaContext context)
+        public BaseRepository(DbSicmaContext context)
         {
             dbSicmaContext = context;
         }
@@ -67,7 +67,7 @@ namespace Sicma.Repositorys.Implementations
         }
 
 
-        public async Task<TEntity?> FindByIdAsync(int id)
+        public async Task<TEntity?> FindByIdAsync(string id)
         {
             return await dbSicmaContext.Set<TEntity>().FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
         }
@@ -84,7 +84,7 @@ namespace Sicma.Repositorys.Implementations
             await dbSicmaContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(string id)
         {
             await dbSicmaContext.Set<TEntity>()
                   .Where(p => p.Id == id)
