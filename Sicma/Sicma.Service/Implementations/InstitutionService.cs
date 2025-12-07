@@ -25,13 +25,8 @@ namespace Sicma.Service.Implementations
             var result = new BaseResponse();
             try
             {
-                Institution institution = new()
-                {
-                    Name = request.Name,
-                    CreatedDate = DateTime.Now,
-                    CreatedUserId = "fcb8ed60-fd02-4ead-8012-efe16b109bb2",
-                    IsActive = true,
-                };
+                var institution = _mapper.Map<Institution>(request);
+                institution.CreatedUserId = "fcb8ed60-fd02-4ead-8012-efe16b109bb2";
                 await _institutionRepository.AddAsync(institution);
                 result.Success = true;
                 result.Message = "Institute created correctly";
@@ -77,6 +72,8 @@ namespace Sicma.Service.Implementations
             {
                 var result = await _institutionRepository.GetAllAsync(
                     predicate: p =>p.IsActive
+                    &&
+                    (string.IsNullOrEmpty(request.Name) || p.Name.Contains(request.Name))
                     ,
                     selector: p=> _mapper.Map<ListInstitutionsResponse>(p),
                     orderBy: p=> p.Name,

@@ -68,6 +68,7 @@ namespace Sicma.API
             builder.Services.AddAutoMapper(p =>
             {
                 p.AddProfile<UserMap>();
+                p.AddProfile<InstitutionMap>();
             });
            
             var app = builder.Build();
