@@ -1,19 +1,18 @@
 
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using Scalar.AspNetCore;
 using Sicma.DataAccess.Context;
+using Sicma.DataAccess.SeedData;
+using Sicma.Entities;
 using Sicma.Repositorys.Implementations;
 using Sicma.Repositorys.Interfaces;
 using Sicma.Service.Implementations;
 using Sicma.Service.Interfaces;
 using Sicma.Service.Mappers;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Scalar.AspNetCore;
-using Sicma.Entities;
-using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
-using Sicma.DataAccess.SeedData;
 
 namespace Sicma.API
 {
@@ -24,9 +23,21 @@ namespace Sicma.API
             var builder = WebApplication.CreateBuilder(args);
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             // Add services to the container.
-            builder.Services.AddOpenApi();
+            //builder.Services.AddOpenApi();
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen( options => {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "V1.0",
+                    Title= "Sicma backend V1",
+                    Description ="Sicma API",
+                    Contact = new OpenApiContact {
+                        Name= "test name", 
+                        Url = new Uri("http://localhost")
+                    }
+                });
+            });
         
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
@@ -50,7 +61,9 @@ namespace Sicma.API
                 .AddEntityFrameworkStores<DbSicmaContext>();
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IInstitutionRepository, InstitutionRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 
             builder.Services.AddAutoMapper(p =>
             {
@@ -62,8 +75,15 @@ namespace Sicma.API
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
                 app.MapScalarApiReference();
+
+                app.UseSwagger();
+                //app.UseSwaggerUI( options => 
+                //{
+                //    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Sicma API");
+                //    options.RoutePrefix = "";
+                //});
+                app.UseSwaggerUI();
             }            
 
             app.UseHttpsRedirection();

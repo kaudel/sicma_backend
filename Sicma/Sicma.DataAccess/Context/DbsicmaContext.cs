@@ -18,6 +18,8 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
 
     public virtual DbSet<AppUser> Users { get; set; }
 
+    public virtual DbSet<Institution> Institutions { get; set; }
+
     //public virtual DbSet<UserType> UserTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

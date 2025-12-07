@@ -21,8 +21,8 @@ namespace Sicma.API.Controllers
         }
 
         [HttpPost]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateUserAsync([FromBody] UserRequest request)
         {
             var response = await _userService.Register(request);
@@ -50,51 +50,51 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] UserRequest request)
-        {
-            var result = await _userService.Update(id, request);
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateUser(string id, [FromBody] UserRequest request)
+        //{
+        //    var result = await _userService.Update(id, request);
             
-            if (result != null && result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-                return BadRequest(result.Message);
+        //    if (result != null && result.Success)
+        //    {
+        //        return Ok(result.Message);
+        //    }
+        //    else
+        //        return BadRequest(result.Message);
 
-        }
+        //}
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById( string id)
-        {
-            try
-            {
-                var result = await _userService.GetById(id);
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetUserById( string id)
+        //{
+        //    try
+        //    {
+        //        var result = await _userService.GetById(id);
 
-                if (result != null && result.Success)
-                {
-                    return Ok(result.Data);
-                }
-                else
-                    return BadRequest(result.Message);
-            } catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
+        //        if (result != null && result.Success)
+        //        {
+        //            return Ok(result.Data);
+        //        }
+        //        else
+        //            return BadRequest(result.Message);
+        //    } catch (Exception ex)
+        //    {
+        //        return BadRequest(ex);
+        //    }
+        //}
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
-        {
-            var result = await _userService.Delete(id);
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> DeleteUser(string id)
+        //{
+        //    var result = await _userService.Delete(id);
 
-            if (result != null && result.Success)
-            {
-                return Ok(result.Message);
-            }
-            else
-                return BadRequest(result.Message);
+        //    if (result != null && result.Success)
+        //    {
+        //        return Ok(result.Message);
+        //    }
+        //    else
+        //        return BadRequest(result.Message);
 
-        }
+        //}
     }
 }
