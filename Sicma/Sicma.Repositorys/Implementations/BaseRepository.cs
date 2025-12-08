@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sicma.DataAccess.Context;
 using Sicma.Entities;
+using Sicma.Entities.Interfaces;
 using Sicma.Repositorys.Interfaces;
 using System.Linq.Expressions;
 
 namespace Sicma.Repositorys.Implementations
 {
-    public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : BaseEntity
+    public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class, IBaseEntity
     {
         protected readonly DbSicmaContext dbSicmaContext;
 

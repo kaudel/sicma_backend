@@ -1,9 +1,10 @@
 ﻿using Sicma.Entities;
+using Sicma.Entities.Interfaces;
 using System.Linq.Expressions;
 
 namespace Sicma.Repositorys.Interfaces
 {
-    public interface IBaseRepository<TEntity> where TEntity : BaseEntity
+    public interface IBaseRepository<TEntity> where TEntity:  class, IBaseEntity
     {
         Task<ICollection<TEntity>> GetAllAsync();
         Task<ICollection<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate);

@@ -9,9 +9,9 @@ namespace Sicma.Service.Mappers
     {
         public UserMap() 
         {
-            CreateMap<UserRequest, User>();
-            CreateMap<User, ListUsersResponse>();
-            CreateMap<User, UserResponse>();
+            CreateMap<UserRequest, AppUser>();
+            CreateMap<AppUser, ListUsersResponse>();
+            CreateMap<AppUser, UserResponse>();
         }
     }
 }

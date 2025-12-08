@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Sicma.Common;
 using Sicma.DTO.Request.User;
 using Sicma.DTO.Response;
@@ -13,11 +14,15 @@ namespace Sicma.Service.Implementations
     {
         private readonly IUserRepository _repository;
         private readonly IMapper _mapper;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserService(IUserRepository repo, IMapper mapper)
+        public UserService(IUserRepository repo, IMapper mapper, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _repository = repo;
             _mapper = mapper;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<BaseResponse> Register(UserRequest request)
@@ -26,12 +31,28 @@ namespace Sicma.Service.Implementations
 
             try
             {
-                var user = _mapper.Map<User>(request);
+                if (!_repository.IsUnique(request.UserName))
+                {
+                    response.Success = false;
+                    response.Message = "UserName is already used";
+                    return response;
+                }
 
-                await _repository.AddAsync(user);
+                var user = _mapper.Map<AppUser>(request);
+                user.CreatedUserId = "fcb8ed60-fd02-4ead-8012-efe16b109bb2";
+
+                IdentityResult result = await _userManager.CreateAsync(user, request.Password);
+
+                if (!result.Succeeded)
+                {
+                    response.Success = false;
+                    response.Message = result.Errors.FirstOrDefault().Description;
+                    return response;
+                }
+                await _userManager.AddToRoleAsync(user, request.UserRole);
+
                 response.Message = "User created successfully";
                 response.Success = true;
-
             }
             catch (Exception ex)
             {
@@ -39,8 +60,7 @@ namespace Sicma.Service.Implementations
                 response.Message = ex.Message;
             }
 
-            return response;
-            
+            return response;            
         }
 
         public async Task<PaginationResponse<ListUsersResponse>> GetAll(UserSearchRequest request)
@@ -49,27 +69,28 @@ namespace Sicma.Service.Implementations
 
             try
             {
-                User user = new()
+                AppUser user = new()
                 {
-                    FullName = request.FullName,
-                    Institution = request.Institution,
+                    UserName = request.FullName,
+                    
+                    //Institution = request.Institution,
                     Email = request.Email
                 };
 
                 var result = await _repository.GetAllAsync(
                     predicate: p => p.IsActive 
                     &&
-                    (string.IsNullOrEmpty(request.Institution) || p.Institution.Contains(request.Institution)) &&
-                    (string.IsNullOrEmpty(request.FullName) || p.FullName.Contains(request.FullName))
+                    //(string.IsNullOrEmpty(request.Institution) || p.Institution.Contains(request.Institution)) &&
+                    (string.IsNullOrEmpty(request.FullName) || p.UserName.Contains(request.FullName))
                     ,
                     selector: p => new ListUsersResponse 
                     { 
                         Id = p.Id,
-                        Nickname = p.Nickname,
+                        UserName = p.UserName,
                         FullName = p.FullName,
                         Email = p.Email,
-                        Institution = p.Institution,
-                        UserType = p.UserTypeId
+                        //Institution = p.Institution,
+                        //UserType = p.UserTypeId
                     },
                     //_mapper.Map<ListUsersResponse>(p),
                     orderBy: p => p.FullName,
@@ -98,11 +119,11 @@ namespace Sicma.Service.Implementations
             try
             {
                 var user = await _repository.FindByIdAsync(id);
-                if (user == null) throw new InvalidDataException("User not found");
+                if (user == null) 
+                    throw new InvalidDataException("User not found");
 
                 response.Data = _mapper.Map<UserResponse>(user);
                 response.Success = true;
-
             }
             catch (Exception ex)
             {
@@ -122,8 +143,10 @@ namespace Sicma.Service.Implementations
 
                 if (user == null) throw new InvalidDataException("User not exists");
 
-                //do the mapping directly
-                _mapper.Map(request, user);
+                //_mapper.Map(request, user);
+                //At this moment only the full name is a field editable
+                user.FullName = request.FullName;
+
                 await _repository.UpdateAsync();
 
                 response.Success = true;

@@ -106,7 +106,7 @@ namespace Sicma.API.Controllers
 
             BaseResponse result = await _institutionService.Delete(institutionId);
 
-            if (!result.Success)
+            if (result.Success)
             {
                 return Ok(result.Message);
             }
