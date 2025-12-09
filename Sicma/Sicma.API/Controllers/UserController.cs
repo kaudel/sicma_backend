@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sicma.DTO.Request.User;
 using Sicma.DTO.Response;
 using Sicma.DTO.Response.Users;
@@ -118,6 +119,32 @@ namespace Sicma.API.Controllers
             else
                 return BadRequest(result.Message);
 
+        }
+
+        [AllowAnonymous]
+        [HttpPost("Login")]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest userLogin)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (userLogin == null)
+                return BadRequest(ModelState);
+
+            var loginResponse = await _userService.Login(userLogin);
+
+            if (loginResponse != null || !loginResponse.Success)
+                return BadRequest(loginResponse.Message);
+
+            if (loginResponse == null || string.IsNullOrEmpty(loginResponse.Data.Token))
+            {
+                return BadRequest(loginResponse);
+            }
+
+            return Ok(loginResponse);
         }
     }
 }

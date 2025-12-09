@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Sicma.Common;
 using Sicma.DTO.Request.User;
 using Sicma.DTO.Response;
@@ -7,6 +10,9 @@ using Sicma.DTO.Response.Users;
 using Sicma.Entities;
 using Sicma.Repositorys.Interfaces;
 using Sicma.Service.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Sicma.Service.Implementations
 {
@@ -16,13 +22,17 @@ namespace Sicma.Service.Implementations
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private string _secretKey;
+        private readonly IConfiguration _config;
 
-        public UserService(IUserRepository repo, IMapper mapper, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UserService(IUserRepository repo, IMapper mapper, IConfiguration config, UserManager<AppUser> userManager, 
+            RoleManager<IdentityRole> roleManager)
         {
             _repository = repo;
             _mapper = mapper;
             _userManager = userManager;
             _roleManager = roleManager;
+            _config = config;
         }
 
         public async Task<BaseResponse> Register(UserRequest request)
@@ -119,9 +129,13 @@ namespace Sicma.Service.Implementations
             try
             {
                 var user = await _repository.FindByIdAsync(id);
-                if (user == null) 
-                    throw new InvalidDataException("User not found");
-
+                if (user == null)
+                {
+                    response.Success = false;
+                    response.Message = "User not found";
+                    return response;
+                }
+                    
                 response.Data = _mapper.Map<UserResponse>(user);
                 response.Success = true;
             }
@@ -181,6 +195,64 @@ namespace Sicma.Service.Implementations
                 response.Success = false;
                 response.Message = ex.Message;
             }
+            return response;
+        }
+
+        public async Task<BaseResponse<UserLoginResponse>> Login(UserLoginRequest userLogin)
+        {
+            var response = new BaseResponse<UserLoginResponse>();
+            var user = _repository.GetUserByUserName(userLogin.UserName);
+
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            bool isValid = await _userManager.CheckPasswordAsync(user, userLogin.Password);
+
+            if (user == null || !isValid)
+            {
+                response.Success = false;
+                response.Message = "Username o password is incorrect";
+                return response;
+                //return new UserLoginResponse()
+                //{
+                //    Token = "",
+                //    User = null
+                //};
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            string secretKey = _config["APISettings:secretKey"];
+            var key = Encoding.ASCII.GetBytes(secretKey);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(
+                [
+                    new Claim(ClaimTypes.Name, user.UserName.ToString()),
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault())
+                ]),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            UserLoginResponse userResponse = new UserLoginResponse()
+            {
+                Token = tokenHandler.WriteToken(token),
+                User = _mapper.Map<UserData>(user),
+            };
+
+            response.Success = true;
+            response.Message = "User authenticated";
+            response.Data = userResponse;
+
             return response;
         }
 

@@ -12,6 +12,8 @@ namespace Sicma.Service.Mappers
             CreateMap<UserRequest, AppUser>();
             CreateMap<AppUser, ListUsersResponse>();
             CreateMap<AppUser, UserResponse>();
+            CreateMap<AppUser, UserData>();
+            CreateMap<AppUser, UserLoginResponse>();
         }
     }
 }

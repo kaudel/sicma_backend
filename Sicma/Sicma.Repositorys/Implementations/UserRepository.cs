@@ -22,5 +22,12 @@ namespace Sicma.Repositorys.Implementations
 
             return false;
         }
+
+        public AppUser GetUserByUserName(string userName)
+        {
+            var result = sicmaContext.Users.FirstOrDefault( x=> x.UserName == userName);
+
+            return result;
+        }
     }
 }

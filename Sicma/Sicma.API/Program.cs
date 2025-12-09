@@ -13,6 +13,10 @@ using Sicma.Repositorys.Interfaces;
 using Sicma.Service.Implementations;
 using Sicma.Service.Interfaces;
 using Sicma.Service.Mappers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Sicma.API
 {
@@ -22,28 +26,58 @@ namespace Sicma.API
         {
             var builder = WebApplication.CreateBuilder(args);
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            // Add services to the container.
-            //builder.Services.AddOpenApi();
+
+            // Add services to the container.            
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen( options => {
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description =
+                    "JWT authentication using Bearer schema. \r\n\r\n" +
+                    "Add the word 'Bearer' followed by a space and the token in the field below \r\n\r\n" +
+                    "Example \"Bearer lñskdjfgañlsdknfa0897asdfjkansdfl\" ",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Scheme = "Bearer"
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+
+                            Reference = new OpenApiReference
+                            {
+                                Type= ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme= "oauth2",
+                            Name= "Bearer",
+                            In = ParameterLocation.Header
+                        },
+                        new List<string>()
+                    }
+                });
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "V1.0",
-                    Title= "Sicma backend V1",
-                    Description ="Sicma API",
-                    Contact = new OpenApiContact {
-                        Name= "test name", 
+                    Title = "Sicma backend V1",
+                    Description = "Sicma API",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "test name",
                         Url = new Uri("http://localhost")
                     }
                 });
             });
-        
+
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-            builder.Services.AddDbContext<DbSicmaContext>( options => 
+            builder.Services.AddDbContext<DbSicmaContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DBSicma"));
             });
@@ -70,7 +104,30 @@ namespace Sicma.API
                 p.AddProfile<UserMap>();
                 p.AddProfile<InstitutionMap>();
             });
-           
+
+            //Add access to configuration
+            builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+            var key = builder.Configuration.GetValue<string>("APISettings:secretkey");
+
+            builder.Services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+                ).AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false; //in production need to true
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -85,9 +142,12 @@ namespace Sicma.API
                 //    options.RoutePrefix = "";
                 //});
                 app.UseSwaggerUI();
-            }            
+            }
 
             app.UseHttpsRedirection();
+
+            //support for authentication
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
