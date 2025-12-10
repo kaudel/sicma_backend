@@ -13,7 +13,7 @@ namespace Sicma.Entities
         public string OperationConfigId { get; set; }
         public string TrainingTypeId { get; set; }
         public OperationConfig OperationConfig { get; set; }
-        //public TrainingType TrainingType { get; set; }
+        public TrainingType TrainingType { get; set; }
 
     }
 }

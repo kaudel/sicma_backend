@@ -59,5 +59,10 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
             .HasOne(p => p.OperationConfig)
             .WithOne()
             .HasForeignKey<Exercise>(p => p.OperationConfigId);
+
+        modelBuilder.Entity<Exercise>()
+            .HasOne( p=>p.TrainingType)
+            .WithOne()
+            .HasForeignKey<Exercise>( p => p.TrainingTypeId);
     }    
 }
