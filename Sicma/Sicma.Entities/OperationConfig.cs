@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Sicma.Entities;
 
-namespace Sicma.Entities;
-
-public partial class OperationConfig:BaseEntity
+public  class OperationConfig:BaseEntity
 {
     public string OperationName { get; set; } = null!;
+    public string Description {  get; set; } = null!;
 
-    public string Type { get; set; } = null!;
+    public string TypeSimbol { get; set; } = null!;
 
     public int NumElements { get; set; }
 
     public int Digits { get; set; }
 
     public string Range { get; set; } = null!;
+
+    public string RegexExpression { get; set; } = null!;
+
+    public int TimePeriodSeconds {  get; set; }
 
 }

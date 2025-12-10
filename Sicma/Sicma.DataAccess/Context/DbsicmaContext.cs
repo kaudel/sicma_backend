@@ -14,7 +14,7 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
 
     public virtual DbSet<OperationConfig> OperationConfigs { get; set; }
 
-    public virtual DbSet<PracticeLevel> PracticeLevels { get; set; }
+    public virtual DbSet<TrainingType> TrainingTypes { get; set; }
 
     public virtual DbSet<AppUser> Users { get; set; }
 
@@ -25,6 +25,5 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {        
         base.OnModelCreating(modelBuilder);
-        
     }    
 }
