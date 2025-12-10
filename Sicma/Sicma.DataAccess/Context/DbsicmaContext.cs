@@ -54,5 +54,10 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
                 IsActive = true,
             }
         );
+
+        modelBuilder.Entity<Exercise>()
+            .HasOne(p => p.OperationConfig)
+            .WithOne()
+            .HasForeignKey<Exercise>(p => p.OperationConfigId);
     }    
 }
