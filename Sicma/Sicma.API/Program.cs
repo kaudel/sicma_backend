@@ -1,9 +1,11 @@
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using Sicma.DataAccess.Context;
 using Sicma.DataAccess.SeedData;
@@ -13,9 +15,6 @@ using Sicma.Repositorys.Interfaces;
 using Sicma.Service.Implementations;
 using Sicma.Service.Interfaces;
 using Sicma.Service.Mappers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi.Models;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 namespace Sicma.API
@@ -96,13 +95,16 @@ namespace Sicma.API
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+            builder.Services.AddScoped<IOperationConfigRepository, OperationConfigRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IInstitutionService, InstitutionService>();
+            builder.Services.AddScoped<IOperationConfigService, OperationConfigService>();
 
             builder.Services.AddAutoMapper(p =>
             {
                 p.AddProfile<UserMap>();
                 p.AddProfile<InstitutionMap>();
+                p.AddProfile<OperationConfigMap>();
             });
 
             //Add access to configuration
