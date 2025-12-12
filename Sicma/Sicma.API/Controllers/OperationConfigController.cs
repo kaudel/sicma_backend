@@ -2,6 +2,7 @@
 using Sicma.DTO.Request.OperationConfig;
 using Sicma.DTO.Response;
 using Sicma.Service.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Sicma.API.Controllers
 {
@@ -32,7 +33,7 @@ namespace Sicma.API.Controllers
                 }
                 else
                 {
-                    return BadRequest(result.Message);
+                    return BadRequest(result!.Message);
                 }
             }
             catch (Exception ex)
@@ -57,7 +58,7 @@ namespace Sicma.API.Controllers
                 }
                 else
                 {
-                    return BadRequest(result.Message);
+                    return BadRequest(result!.Message);
                 }
             }
             catch (Exception ex)
@@ -79,7 +80,9 @@ namespace Sicma.API.Controllers
             if (request == null)
                 return BadRequest(ModelState);
 
-            BaseResponse result = await _operationConfigService.Create(request);
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            BaseResponse result = await _operationConfigService.Create(request, userId);
             if (result.Success)
             {
                 return Created();

@@ -159,7 +159,7 @@ namespace Sicma.Service.Implementations
             {
                 var tokenHistory = await GetTokenHistory(request, userId);
 
-                await _tokenHistoryRepository.DeleteRevokeAsync(tokenHistory.Data.Id);
+                await _tokenHistoryRepository.DeleteRevokeAsync(tokenHistory.Data!.Id);
 
                 result.Success = true;
             }

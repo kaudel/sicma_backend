@@ -20,14 +20,14 @@ namespace Sicma.Service.Implementations
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse> Create(OperationConfigRequest request)
+        public async Task<BaseResponse> Create(OperationConfigRequest request, string userId)
         {
             var result = new BaseResponse();
 
             try
             {
                 var operationConfig = _mapper.Map<OperationConfig>(request);
-                operationConfig.CreatedUserId = "fcb8ed60-fd02-4ead-8012-efe16b109bb2";
+                operationConfig.CreatedUserId = userId;
                 await _operationConfigRepository.AddAsync(operationConfig);
                 result.Success = true;
                 result.Message = "OperationConfig created correctly";
@@ -129,6 +129,7 @@ namespace Sicma.Service.Implementations
                     throw new InvalidDataException("OperationConfig not found");
 
                 _mapper.Map(request, operationConfig);
+                operationConfig.UpdatedDate = DateTime.UtcNow;
                 await _operationConfigRepository.UpdateAsync();
 
                 response.Success = true;

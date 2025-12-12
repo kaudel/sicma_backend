@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sicma.DataAccess.Context;
-using Sicma.Entities;
 using Sicma.Entities.Interfaces;
 using Sicma.Repositorys.Interfaces;
 using System.Linq.Expressions;
@@ -91,6 +90,7 @@ namespace Sicma.Repositorys.Implementations
                   .Where(p => p.Id == id)
                   .ExecuteUpdateAsync(
                     p => p.SetProperty(p => p.IsActive, false)
+                    .SetProperty(p => p.UpdatedDate, DateTime.UtcNow)                    
                 );
         }
     }

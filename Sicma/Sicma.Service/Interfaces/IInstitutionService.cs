@@ -6,7 +6,7 @@ namespace Sicma.Service.Interfaces
 {
     public interface IInstitutionService
     {
-        Task<BaseResponse> Create(InstitutionRequest request);
+        Task<BaseResponse> Create(InstitutionRequest request, string userId);
         Task<PaginationResponse<ListInstitutionsResponse>> GetAll(InstitutionSearchRequest request);
         Task<BaseResponse<InstitutionResponse>> GetById(string id);
         Task<BaseResponse> Delete(string institutionId);

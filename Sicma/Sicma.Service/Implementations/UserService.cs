@@ -16,7 +16,6 @@ namespace Sicma.Service.Implementations
         private readonly IUserRepository _repository;
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
         public UserService(IUserRepository repo, IMapper mapper, UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager)
@@ -24,7 +23,6 @@ namespace Sicma.Service.Implementations
             _repository = repo;
             _mapper = mapper;
             _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         public async Task<BaseResponse> Register(UserRequest request)
@@ -81,7 +79,7 @@ namespace Sicma.Service.Implementations
                     predicate: p => p.IsActive
                     &&
                     //(string.IsNullOrEmpty(request.Institution) || p.Institution.Contains(request.Institution)) &&
-                    (string.IsNullOrEmpty(request.FullName) || p.UserName.Contains(request.FullName))
+                    (string.IsNullOrEmpty(request.FullName) || p.UserName!.Contains(request.FullName))
                     ,
                     selector: p => new ListUsersResponse
                     {
@@ -147,8 +145,6 @@ namespace Sicma.Service.Implementations
 
                 if (user == null) throw new InvalidDataException("User not exists");
 
-                //_mapper.Map(request, user);
-                //At this moment only the full name is a field editable
                 user.FullName = request.FullName;
 
                 await _repository.UpdateAsync();

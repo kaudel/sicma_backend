@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sicma.DTO.Request.Institution;
 using Sicma.DTO.Response;
 using Sicma.Service.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Sicma.API.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class InstitutionController : ControllerBase
@@ -15,11 +19,12 @@ namespace Sicma.API.Controllers
         {
             _institutionService = institutionService;
         }
-
+        
         [HttpGet("GetInstitutions")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetInstitutions([FromQuery] InstitutionSearchRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -32,7 +37,7 @@ namespace Sicma.API.Controllers
                 }
                 else
                 {
-                    return BadRequest(result.Message);
+                    return BadRequest(result!.Message);
                 }
             }
             catch (Exception ex)
@@ -45,6 +50,7 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetInstitutionsById([FromQuery] string request,
             CancellationToken cancellationToken = default)
         {
@@ -57,7 +63,7 @@ namespace Sicma.API.Controllers
                 }
                 else
                 {
-                    return BadRequest(result.Message);
+                    return BadRequest(result!.Message);
                 }
             }
             catch (Exception ex)
@@ -72,16 +78,19 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CreateInstitution([FromBody]InstitutionRequest institutionRequest,
             CancellationToken cancellationToken = default)
         {
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             if(institutionRequest == null)
                 return BadRequest(ModelState);
 
-            BaseResponse result = await _institutionService.Create(institutionRequest);
+            BaseResponse result = await _institutionService.Create(institutionRequest,userId!);
             if (result.Success)
             {
                 return Created();
@@ -101,6 +110,8 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteInstitution(string institutionId)
         {
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
             if (string.IsNullOrEmpty(institutionId))
                 return BadRequest(ModelState);
 
@@ -120,6 +131,7 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateInstitution(string id,[FromBody] InstitutionRequest institutionRequest,
             CancellationToken cancellationToken = default)
         {
@@ -128,6 +140,8 @@ namespace Sicma.API.Controllers
 
             if (institutionRequest == null)
                 return BadRequest(ModelState);
+
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
             BaseResponse result = await _institutionService.Update(id,institutionRequest);
             if (result.Success)

@@ -42,7 +42,7 @@ namespace Sicma.API.Controllers
                     return Ok(result.Data);
                 }
                 else
-                    return BadRequest(result.Message);
+                    return BadRequest(result!.Message);
             }
             catch (Exception ex)
             {
@@ -66,7 +66,7 @@ namespace Sicma.API.Controllers
                     return Ok(result.Data);
                 }
                 else
-                    return BadRequest(result.Message);
+                    return BadRequest(result!.Message);
             }
             catch (Exception ex)
             {
@@ -105,7 +105,7 @@ namespace Sicma.API.Controllers
                 return Ok(result.Message);
             }
             else
-                return BadRequest(result.Message);
+                return BadRequest(result!.Message);
         }
 
         [HttpDelete("{id}")]
@@ -121,7 +121,7 @@ namespace Sicma.API.Controllers
                 return Ok(result.Message);
             }
             else
-                return BadRequest(result.Message);
+                return BadRequest(result!.Message);
 
         }
 
@@ -141,31 +141,31 @@ namespace Sicma.API.Controllers
             var loginResponse = await _userService.Authenticate(userLogin);
 
             if (loginResponse == null || !loginResponse.Success)
-                return Unauthorized(loginResponse.Message);
+                return Unauthorized(loginResponse!.Message);
 
-            var accessToken = await _tokenHistoryService.CreateAccessToken(loginResponse.Data);
+            var accessToken = await _tokenHistoryService.CreateAccessToken(loginResponse.Data!);
 
             if (accessToken == null || !accessToken.Success)
             {
-                return BadRequest(accessToken.Message);
+                return BadRequest(accessToken!.Message);
             }
 
             var tokenRefreshRequest = new TokenRefreshRequest()
             {
-                ExpiredToken = accessToken.Data.Token,
+                ExpiredToken = accessToken.Data!.Token,
             };
 
-            var refreshToken = await _tokenHistoryService.CreateRefreshToken(tokenRefreshRequest, loginResponse.Data.Id);
+            var refreshToken = await _tokenHistoryService.CreateRefreshToken(tokenRefreshRequest, loginResponse.Data!.Id);
 
             if (refreshToken == null || !refreshToken.Success)
             {
-                return BadRequest(refreshToken.Message);
+                return BadRequest(refreshToken!.Message);
             }
 
             var response = new UserLoginResponse()
             {
                 Token = accessToken.Data.Token,
-                RefreshToken = refreshToken.Data.RefreshToken
+                RefreshToken = refreshToken.Data!.RefreshToken
             };
 
             return Ok(response);
@@ -206,25 +206,25 @@ namespace Sicma.API.Controllers
 
             if (accessToken == null || !accessToken.Success)
             {
-                return BadRequest(accessToken.Message);
+                return BadRequest(accessToken!.Message);
             }
 
             var tokenRefreshRequestNew = new TokenRefreshRequest()
             {
-                ExpiredToken = accessToken.Data.Token
+                ExpiredToken = accessToken.Data!.Token
             };
 
             var refreshToken = await _tokenHistoryService.CreateRefreshToken(tokenRefreshRequestNew, token.Subject);
 
             if (refreshToken == null || !refreshToken.Success)
             {
-                return BadRequest(refreshToken.Message);
+                return BadRequest(refreshToken!.Message);
             }
 
             var response = new UserLoginResponse()
             {
                 Token = accessToken.Data.Token,
-                RefreshToken = refreshToken.Data.RefreshToken
+                RefreshToken = refreshToken.Data!.RefreshToken
             };
 
             return Ok(response);
@@ -263,7 +263,7 @@ namespace Sicma.API.Controllers
 
             if (isLogout == null || !isLogout.Success)
             {
-                return BadRequest(isLogout.Message);
+                return BadRequest(isLogout!.Message);
             }
 
             return Ok(isLogout.Message);

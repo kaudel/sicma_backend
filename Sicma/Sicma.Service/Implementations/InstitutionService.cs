@@ -20,13 +20,14 @@ namespace Sicma.Service.Implementations
             _mapper = mapper;            
         }
 
-        public async Task<BaseResponse> Create(InstitutionRequest request)
+        public async Task<BaseResponse> Create(InstitutionRequest request, string userId)
         {
             var result = new BaseResponse();
             try
             {
                 var institution = _mapper.Map<Institution>(request);
-                institution.CreatedUserId = "fcb8ed60-fd02-4ead-8012-efe16b109bb2";
+                institution.CreatedUserId = userId;
+
                 await _institutionRepository.AddAsync(institution);
                 result.Success = true;
                 result.Message = "Institute created correctly";
@@ -126,6 +127,7 @@ namespace Sicma.Service.Implementations
                 if (institution == null)
                     throw new InvalidDataException("Institution not found");
 
+                institution.UpdatedDate = DateTime.UtcNow;
                 _mapper.Map(request, institution);
                 await _institutionRepository.UpdateAsync();
 

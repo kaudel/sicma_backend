@@ -6,7 +6,7 @@ namespace Sicma.Service.Interfaces
 {
     public interface IOperationConfigService
     {
-        Task<BaseResponse> Create(OperationConfigRequest request);
+        Task<BaseResponse> Create(OperationConfigRequest request, string userId);
         Task<BaseResponse> Delete(string operationConfigId);
         Task<PaginationResponse<ListOperationConfigResponse>> GetAll(OperationConfigSearchRequest request);
         Task<BaseResponse<OperationConfigResponse>> GetById(string id);
