@@ -20,6 +20,8 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
 
     public virtual DbSet<Institution> Institutions { get; set; }
 
+    public virtual DbSet<TokenHistory> TokenHistory { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {        
@@ -64,5 +66,10 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
             .HasOne( p=>p.TrainingType)
             .WithOne()
             .HasForeignKey<Exercise>( p => p.TrainingTypeId);
+
+        //computed field
+        modelBuilder.Entity<TokenHistory>()
+            .Property(p => p.IsActive)
+            .HasComputedColumnSql("Case WHEN [ExpirationDate] > GETDATE() THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END");
     }    
 }

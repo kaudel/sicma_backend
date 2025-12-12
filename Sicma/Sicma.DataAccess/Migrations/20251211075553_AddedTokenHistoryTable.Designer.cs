@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sicma.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using Sicma.DataAccess.Context;
 namespace Sicma.DataAccess.Migrations
 {
     [DbContext(typeof(DbSicmaContext))]
-    partial class DbSicmaContextModelSnapshot : ModelSnapshot
+    [Migration("20251211075553_AddedTokenHistoryTable")]
+    partial class AddedTokenHistoryTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -383,7 +386,7 @@ namespace Sicma.DataAccess.Migrations
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bit")
-                        .HasComputedColumnSql("Case WHEN [ExpirationDate] > GETDATE() THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END");
+                        .HasComputedColumnSql("Case WHEN [ExpirationDate] > GETDATE() THEN 1 ELSE 0 END");
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()

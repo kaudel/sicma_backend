@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sicma.DTO.Request.Token;
 using Sicma.DTO.Request.User;
 using Sicma.DTO.Response;
 using Sicma.DTO.Response.Users;
 using Sicma.Service.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Sicma.API.Controllers
 {
@@ -12,13 +14,15 @@ namespace Sicma.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ITokenHistoryService _tokenHistoryService;
 
         public ICollection<ListUsersResponse> listUsers { get; set; } = new List<ListUsersResponse>();
         public UserSearchRequest request { get; set; } = new UserSearchRequest();
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, ITokenHistoryService tokenHistoryService)
         {
             _userService = userService;
+            _tokenHistoryService = tokenHistoryService;
         }
 
 
@@ -134,17 +138,135 @@ namespace Sicma.API.Controllers
             if (userLogin == null)
                 return BadRequest(ModelState);
 
-            var loginResponse = await _userService.Login(userLogin);
+            var loginResponse = await _userService.Authenticate(userLogin);
 
-            if (loginResponse != null || !loginResponse.Success)
-                return BadRequest(loginResponse.Message);
+            if (loginResponse == null || !loginResponse.Success)
+                return Unauthorized(loginResponse.Message);
 
-            if (loginResponse == null || string.IsNullOrEmpty(loginResponse.Data.Token))
+            var accessToken = await _tokenHistoryService.CreateAccessToken(loginResponse.Data);
+
+            if (accessToken == null || !accessToken.Success)
             {
-                return BadRequest(loginResponse);
+                return BadRequest(accessToken.Message);
             }
 
-            return Ok(loginResponse);
+            var tokenRefreshRequest = new TokenRefreshRequest()
+            {
+                ExpiredToken = accessToken.Data.Token,
+            };
+
+            var refreshToken = await _tokenHistoryService.CreateRefreshToken(tokenRefreshRequest, loginResponse.Data.Id);
+
+            if (refreshToken == null || !refreshToken.Success)
+            {
+                return BadRequest(refreshToken.Message);
+            }
+
+            var response = new UserLoginResponse()
+            {
+                Token = accessToken.Data.Token,
+                RefreshToken = refreshToken.Data.RefreshToken
+            };
+
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("Refresh")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Refresh([FromBody] TokenRefreshRequest tokenRefreshRequest)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (tokenRefreshRequest == null)
+                return BadRequest(ModelState);
+
+            var tokenhandler = new JwtSecurityTokenHandler();
+            var token = tokenhandler.ReadJwtToken(tokenRefreshRequest.ExpiredToken);
+
+            if (token.ValidTo > DateTime.UtcNow)
+                return Unauthorized("Refresh Token invalid");
+
+            UserAutenticateResponse userAuth = new()
+            {
+                Id = token.Subject
+            };
+
+            //validate refreshtoken
+            var tokenRefreshExists = await _tokenHistoryService.ExistsTokenHistory(tokenRefreshRequest, token.Subject);
+
+            if (tokenRefreshExists == null || !tokenRefreshExists.Success)
+                return Unauthorized("Refresh Token invalid");
+
+            var accessToken = await _tokenHistoryService.CreateAccessToken(userAuth);
+
+            if (accessToken == null || !accessToken.Success)
+            {
+                return BadRequest(accessToken.Message);
+            }
+
+            var tokenRefreshRequestNew = new TokenRefreshRequest()
+            {
+                ExpiredToken = accessToken.Data.Token
+            };
+
+            var refreshToken = await _tokenHistoryService.CreateRefreshToken(tokenRefreshRequestNew, token.Subject);
+
+            if (refreshToken == null || !refreshToken.Success)
+            {
+                return BadRequest(refreshToken.Message);
+            }
+
+            var response = new UserLoginResponse()
+            {
+                Token = accessToken.Data.Token,
+                RefreshToken = refreshToken.Data.RefreshToken
+            };
+
+            return Ok(response);
+
+        }
+
+        [AllowAnonymous]
+        [HttpPost("Logout")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Logout([FromBody] TokenRefreshRequest tokenRefreshRequest)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (tokenRefreshRequest == null)
+                return BadRequest(ModelState);
+
+            var tokenhandler = new JwtSecurityTokenHandler();
+            var token = tokenhandler.ReadJwtToken(tokenRefreshRequest.ExpiredToken);
+
+            UserAutenticateResponse userAuth = new()
+            {
+                Id = token.Subject
+            };
+
+            //validate refreshtoken
+            var tokenRefreshExists = await _tokenHistoryService.ExistsTokenHistory(tokenRefreshRequest, token.Subject);
+
+            if (tokenRefreshExists == null || !tokenRefreshExists.Success)
+                return Unauthorized("Refresh Token invalid");
+
+            var isLogout = await _tokenHistoryService.InvalidateToken(tokenRefreshRequest, token.Subject);
+
+            if (isLogout == null || !isLogout.Success)
+            {
+                return BadRequest(isLogout.Message);
+            }
+
+            return Ok(isLogout.Message);
         }
     }
 }

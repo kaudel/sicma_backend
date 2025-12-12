@@ -11,6 +11,6 @@ namespace Sicma.Service.Interfaces
         Task<BaseResponse> Delete(string id);
         Task<BaseResponse> Update(string id, UserRequest request);
         Task<BaseResponse<UserResponse>> GetById(string id);
-        Task<BaseResponse<UserLoginResponse>> Login(UserLoginRequest userLogin);
+        Task<BaseResponse<UserAutenticateResponse>> Authenticate(UserLoginRequest userLogin);
     }
 }

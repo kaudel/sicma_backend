@@ -96,15 +96,18 @@ namespace Sicma.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IInstitutionRepository, InstitutionRepository>();
             builder.Services.AddScoped<IOperationConfigRepository, OperationConfigRepository>();
+            builder.Services.AddScoped<ITokenHistoryRepository, TokenHistoryRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IInstitutionService, InstitutionService>();
             builder.Services.AddScoped<IOperationConfigService, OperationConfigService>();
+            builder.Services.AddScoped<ITokenHistoryService, TokenHistoryService>();
 
             builder.Services.AddAutoMapper(p =>
             {
                 p.AddProfile<UserMap>();
                 p.AddProfile<InstitutionMap>();
                 p.AddProfile<OperationConfigMap>();
+                p.AddProfile<TokenHistoryMap>();
             });
 
             //Add access to configuration
@@ -126,7 +129,8 @@ namespace Sicma.API
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        ValidateLifetime= true
                     };
                 });
 

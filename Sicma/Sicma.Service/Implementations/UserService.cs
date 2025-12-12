@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Sicma.Common;
 using Sicma.DTO.Request.User;
 using Sicma.DTO.Response;
@@ -10,29 +8,23 @@ using Sicma.DTO.Response.Users;
 using Sicma.Entities;
 using Sicma.Repositorys.Interfaces;
 using Sicma.Service.Interfaces;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Sicma.Service.Implementations
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _repository;
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private string _secretKey;
-        private readonly IConfiguration _config;
 
-        public UserService(IUserRepository repo, IMapper mapper, IConfiguration config, UserManager<AppUser> userManager, 
+        public UserService(IUserRepository repo, IMapper mapper, UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             _repository = repo;
             _mapper = mapper;
             _userManager = userManager;
             _roleManager = roleManager;
-            _config = config;
         }
 
         public async Task<BaseResponse> Register(UserRequest request)
@@ -70,7 +62,7 @@ namespace Sicma.Service.Implementations
                 response.Message = ex.Message;
             }
 
-            return response;            
+            return response;
         }
 
         public async Task<PaginationResponse<ListUsersResponse>> GetAll(UserSearchRequest request)
@@ -82,19 +74,17 @@ namespace Sicma.Service.Implementations
                 AppUser user = new()
                 {
                     UserName = request.FullName,
-                    
-                    //Institution = request.Institution,
                     Email = request.Email
                 };
 
                 var result = await _repository.GetAllAsync(
-                    predicate: p => p.IsActive 
+                    predicate: p => p.IsActive
                     &&
                     //(string.IsNullOrEmpty(request.Institution) || p.Institution.Contains(request.Institution)) &&
                     (string.IsNullOrEmpty(request.FullName) || p.UserName.Contains(request.FullName))
                     ,
-                    selector: p => new ListUsersResponse 
-                    { 
+                    selector: p => new ListUsersResponse
+                    {
                         Id = p.Id,
                         UserName = p.UserName,
                         FullName = p.FullName,
@@ -116,7 +106,7 @@ namespace Sicma.Service.Implementations
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message= ex.Message;
+                response.Message = ex.Message;
             }
 
             return response;
@@ -135,7 +125,7 @@ namespace Sicma.Service.Implementations
                     response.Message = "User not found";
                     return response;
                 }
-                    
+
                 response.Data = _mapper.Map<UserResponse>(user);
                 response.Success = true;
             }
@@ -170,9 +160,9 @@ namespace Sicma.Service.Implementations
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message= ex.Message;
+                response.Message = ex.Message;
             }
-            
+
             return response;
         }
 
@@ -198,9 +188,9 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<UserLoginResponse>> Login(UserLoginRequest userLogin)
+        public async Task<BaseResponse<UserAutenticateResponse>> Authenticate(UserLoginRequest userLogin)
         {
-            var response = new BaseResponse<UserLoginResponse>();
+            var response = new BaseResponse<UserAutenticateResponse>();
             var user = _repository.GetUserByUserName(userLogin.UserName);
 
             if (user == null)
@@ -217,41 +207,18 @@ namespace Sicma.Service.Implementations
                 response.Success = false;
                 response.Message = "Username o password is incorrect";
                 return response;
-                //return new UserLoginResponse()
-                //{
-                //    Token = "",
-                //    User = null
-                //};
             }
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            string secretKey = _config["APISettings:secretKey"];
-            var key = Encoding.ASCII.GetBytes(secretKey);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+            UserAutenticateResponse userAuthResponse = new UserAutenticateResponse()
             {
-                Subject = new ClaimsIdentity(
-                [
-                    new Claim(ClaimTypes.Name, user.UserName.ToString()),
-                    new Claim(ClaimTypes.Role, roles.FirstOrDefault())
-                ]),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            UserLoginResponse userResponse = new UserLoginResponse()
-            {
-                Token = tokenHandler.WriteToken(token),
-                User = _mapper.Map<UserData>(user),
+                Id = user.Id,
+                Email = user.Email!,
+                UserName = user.UserName!
             };
 
             response.Success = true;
             response.Message = "User authenticated";
-            response.Data = userResponse;
+            response.Data = userAuthResponse;
 
             return response;
         }
