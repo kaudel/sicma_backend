@@ -1,4 +1,5 @@
-﻿using Sicma.DataAccess.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using Sicma.DataAccess.Context;
 using Sicma.Entities;
 using Sicma.Repositorys.Interfaces;
 
@@ -11,6 +12,15 @@ namespace Sicma.Repositorys.Implementations
         public TokenHistoryRepository(DbSicmaContext context):base(context)
         {
             _dbSicmaContext = context;
+        }
+
+        public async Task DeleteRevokeAsync(string tokenId)
+        {
+            await _dbSicmaContext.TokenHistory
+                    .Where(p => p.Id == tokenId)
+                    .ExecuteUpdateAsync(
+                        p => p.SetProperty(p => p.IsRevoked, true)
+                        );
         }
     }
 }

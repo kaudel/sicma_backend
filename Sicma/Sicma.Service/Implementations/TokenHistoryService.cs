@@ -42,8 +42,8 @@ namespace Sicma.Service.Implementations
             var resultQry = await _tokenHistoryRepository.GetAllAsync(
                 predicate: p => p.Token == request.ExpiredToken &&
                                 p.RefreshToken == request.RefreshToken &&
-                                p.CreatedUserId == userId
-                ,
+                                p.CreatedUserId == userId &&
+                                !p.IsRevoked,   
                 selector: p => new TokenHistory()
                 {
                     Id = p.Id,
@@ -92,7 +92,7 @@ namespace Sicma.Service.Implementations
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(_configuration["JWT:ExpirationMInutes"])),
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(_configuration["JWT:ExpirationMinutes"])),
                 SigningCredentials = credentails,
                 Issuer = _configuration["JWT:Issuer"],
                 Audience = _configuration["JWT:Audience"]
@@ -119,6 +119,7 @@ namespace Sicma.Service.Implementations
             try
             {
                 string refreshToken = GenerateRefreshToken();
+                int expirationTime = Convert.ToInt16(_configuration["JWT:RefreshExpirationMinutes"]);
 
                 TokenHistory token = new TokenHistory()
                 {
@@ -158,7 +159,7 @@ namespace Sicma.Service.Implementations
             {
                 var tokenHistory = await GetTokenHistory(request, userId);
 
-                await _tokenHistoryRepository.DeleteAsync(tokenHistory.Data.Id);
+                await _tokenHistoryRepository.DeleteRevokeAsync(tokenHistory.Data.Id);
 
                 result.Success = true;
             }
