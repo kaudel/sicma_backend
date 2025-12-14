@@ -80,12 +80,16 @@ namespace Sicma.Service.Implementations
             List<Claim> claims =
                 [
                 new (JwtRegisteredClaimNames.Sub, user.Id),
+                new( ClaimTypes.NameIdentifier, user.Id),
                 new (JwtRegisteredClaimNames.Email, user.Email!),
                 new (JwtRegisteredClaimNames.Name, user.UserName!),
                 new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new (JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),ClaimValueTypes.Integer64),
-                ..roles.Select( r=> new Claim(ClaimTypes.Role, r))
+                //..roles.Select( r=> new Claim(ClaimTypes.Role, r))
                 ];
+
+            foreach (var role in roles)
+                claims.Add(new Claim(ClaimTypes.Role, role));
 
             var credentails = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 

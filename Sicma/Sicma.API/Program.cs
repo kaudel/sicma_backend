@@ -119,13 +119,15 @@ namespace Sicma.API
 
             var key = builder.Configuration.GetValue<string>("APISettings:secretkey");
 
-            builder.Services.AddAuthentication(x =>
+            builder.Services.AddAuthentication(options =>
                 {
-                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    
                 }
                 ).AddJwtBearer(x =>
                 {
+                    x.MapInboundClaims = false;
                     x.RequireHttpsMetadata = false; //in production need to true
                     x.SaveToken = true;
                     x.TokenValidationParameters = new TokenValidationParameters
@@ -134,7 +136,7 @@ namespace Sicma.API
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                        ValidateLifetime= true
+                        ValidateLifetime = true
                     };
                 });
 
@@ -146,11 +148,7 @@ namespace Sicma.API
                 app.MapScalarApiReference();
 
                 app.UseSwagger();
-                //app.UseSwaggerUI( options => 
-                //{
-                //    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Sicma API");
-                //    options.RoutePrefix = "";
-                //});
+
                 app.UseSwaggerUI();
             }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sicma.DTO.Request.OperationConfig;
 using Sicma.DTO.Response;
 using Sicma.Service.Interfaces;
@@ -6,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Sicma.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OperationConfigController : ControllerBase
@@ -17,7 +19,7 @@ namespace Sicma.API.Controllers
             _operationConfigService = operationConfigService;
         }
 
-        [HttpGet("GetOperationConfigs")]
+        [HttpGet("GetAll")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -42,16 +44,17 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpGet("GetOperationConfigsById")]
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOperationConfigsById([FromQuery] string requestId,
+        public async Task<IActionResult> GetOperationConfigsById([FromQuery] string id,
            CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _operationConfigService.GetById(requestId);
+                var result = await _operationConfigService.GetById(id);
                 if (result != null && result.Success)
                 {
                     return Ok(result);
@@ -81,6 +84,8 @@ namespace Sicma.API.Controllers
                 return BadRequest(ModelState);
 
             var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var token = tokenHandler.ReadToken(request.)
 
             BaseResponse result = await _operationConfigService.Create(request, userId);
             if (result.Success)
@@ -93,18 +98,18 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpDelete("operationConfigId:string", Name = "DeleteOperationConfig")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteOperationConfig(string operationConfigId)
+        public async Task<IActionResult> DeleteOperationConfig(string id)
         {
-            if (string.IsNullOrEmpty(operationConfigId))
+            if (string.IsNullOrEmpty(id))
                 return BadRequest(ModelState);
 
-            BaseResponse result = await _operationConfigService.Delete(operationConfigId);
+            BaseResponse result = await _operationConfigService.Delete(id);
 
             if (result.Success)
             {
