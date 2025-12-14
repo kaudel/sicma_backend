@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sicma.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using Sicma.DataAccess.Context;
 namespace Sicma.DataAccess.Migrations
 {
     [DbContext(typeof(DbSicmaContext))]
-    partial class DbSicmaContextModelSnapshot : ModelSnapshot
+    [Migration("20251214050914_RenamedTableExercise")]
+    partial class RenamedTableExercise
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -127,7 +127,6 @@ namespace Sicma.Service.Implementations
                 if (institution == null)
                     throw new InvalidDataException("Institution not found");
 
-                institution.UpdatedDate = DateTime.UtcNow;
                 _mapper.Map(request, institution);
                 await _institutionRepository.UpdateAsync();
 

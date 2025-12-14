@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Sicma.Common;
+using Sicma.DataAccess.Context;
 using Sicma.DTO.Request.User;
 using Sicma.DTO.Response;
 using Sicma.DTO.Response.Users;
@@ -15,14 +16,16 @@ namespace Sicma.Service.Implementations
     {
         private readonly IUserRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _uow;
         private readonly UserManager<AppUser> _userManager;
 
-        public UserService(IUserRepository repo, IMapper mapper, UserManager<AppUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+        public UserService(IUserRepository repo, IMapper mapper, IUnitOfWork uow, 
+            UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _repository = repo;
             _mapper = mapper;
             _userManager = userManager;
+            _uow = uow;
         }
 
         public async Task<BaseResponse> Register(UserRequest request)
@@ -31,6 +34,8 @@ namespace Sicma.Service.Implementations
 
             try
             {
+                await _uow.BeginTransactionAsync();
+                
                 if (!_repository.IsUnique(request.UserName))
                 {
                     response.Success = false;
@@ -51,11 +56,14 @@ namespace Sicma.Service.Implementations
                 }
                 await _userManager.AddToRoleAsync(user, request.UserRole);
 
+                await _uow.CommitAsync();
+
                 response.Message = "User created successfully";
                 response.Success = true;
             }
             catch (Exception ex)
             {
+                await _uow.RollbackAsync();
                 response.Success = false;
                 response.Message = ex.Message;
             }

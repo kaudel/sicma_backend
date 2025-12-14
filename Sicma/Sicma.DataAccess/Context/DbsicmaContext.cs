@@ -22,6 +22,8 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
 
     public virtual DbSet<TokenHistory> TokenHistory { get; set; }
 
+    public virtual DbSet<PracticeConfig> PracticeConfigs {  get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {        
@@ -57,15 +59,15 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser>
             }
         );
 
-        modelBuilder.Entity<Exercise>()
+        modelBuilder.Entity<PracticeConfig>()
             .HasOne(p => p.OperationConfig)
             .WithOne()
-            .HasForeignKey<Exercise>(p => p.OperationConfigId);
+            .HasForeignKey<PracticeConfig>(p => p.OperationConfigId);
 
-        modelBuilder.Entity<Exercise>()
+        modelBuilder.Entity<PracticeConfig>()
             .HasOne( p=>p.TrainingType)
             .WithOne()
-            .HasForeignKey<Exercise>( p => p.TrainingTypeId);
+            .HasForeignKey<PracticeConfig>( p => p.TrainingTypeId);
 
         //computed field
         modelBuilder.Entity<TokenHistory>()

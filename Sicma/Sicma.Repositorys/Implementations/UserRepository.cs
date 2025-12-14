@@ -25,7 +25,7 @@ namespace Sicma.Repositorys.Implementations
 
         public AppUser GetUserByUserName(string userName)
         {
-            var result = sicmaContext.Users.FirstOrDefault( x=> x.UserName == userName);
+            var result = sicmaContext.Users.FirstOrDefault( x=> x.UserName == userName && x.IsActive);
 
             return result;
         }
