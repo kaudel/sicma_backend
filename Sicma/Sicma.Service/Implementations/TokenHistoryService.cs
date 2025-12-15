@@ -35,7 +35,7 @@ namespace Sicma.Service.Implementations
             _userManager = userManager;
         }
 
-        public async Task<BaseResponse> ExistsTokenHistory( TokenRefreshRequest request, string userId)
+        public async Task<BaseResponse> ExistsTokenHistory( TokenRefreshRequest request, Guid userId)
         {
             var result = new BaseResponse();
 
@@ -79,8 +79,8 @@ namespace Sicma.Service.Implementations
 
             List<Claim> claims =
                 [
-                new (JwtRegisteredClaimNames.Sub, user.Id),
-                new( ClaimTypes.NameIdentifier, user.Id),
+                new (JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new( ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new (JwtRegisteredClaimNames.Email, user.Email!),
                 new (JwtRegisteredClaimNames.Name, user.UserName!),
                 new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -116,7 +116,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<TokenResponse>> CreateRefreshToken(TokenRefreshRequest request, string userId)
+        public async Task<BaseResponse<TokenResponse>> CreateRefreshToken(TokenRefreshRequest request, Guid userId)
         {
             var result = new BaseResponse<TokenResponse>();
 
@@ -155,7 +155,7 @@ namespace Sicma.Service.Implementations
             return result;
         }
 
-        public async Task<BaseResponse> InvalidateToken(TokenRefreshRequest request, string userId)
+        public async Task<BaseResponse> InvalidateToken(TokenRefreshRequest request, Guid userId)
         {
             var result = new BaseResponse<BaseResponse>();
 
@@ -175,7 +175,7 @@ namespace Sicma.Service.Implementations
             return result;
         }
 
-        public async Task<BaseResponse<TokenHistory>> GetTokenHistory(TokenRefreshRequest request, string userId)
+        public async Task<BaseResponse<TokenHistory>> GetTokenHistory(TokenRefreshRequest request, Guid userId)
         {
             var result = new BaseResponse<TokenHistory>();
 

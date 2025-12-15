@@ -10,6 +10,6 @@
         
         public string Institution { get; set; } = null!;
 
-        public int UserTypeId { get; set; }
+        public Guid UserTypeId { get; set; }
     }
 }

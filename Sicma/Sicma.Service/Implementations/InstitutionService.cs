@@ -20,7 +20,7 @@ namespace Sicma.Service.Implementations
             _mapper = mapper;            
         }
 
-        public async Task<BaseResponse> Create(InstitutionRequest request, string userId)
+        public async Task<BaseResponse> Create(InstitutionRequest request, Guid userId)
         {
             var result = new BaseResponse();
             try
@@ -40,7 +40,7 @@ namespace Sicma.Service.Implementations
             return result;
         }
 
-        public async Task<BaseResponse> Delete(string institutionId)
+        public async Task<BaseResponse> Delete(Guid institutionId)
         {
             var result = new BaseResponse();
             try
@@ -96,7 +96,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<InstitutionResponse>> GetById(string id)
+        public async Task<BaseResponse<InstitutionResponse>> GetById(Guid id)
         {
             var response = new BaseResponse<InstitutionResponse>();
 
@@ -117,7 +117,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse> Update(string id, InstitutionRequest request)
+        public async Task<BaseResponse> Update(Guid id, InstitutionRequest request)
         {
             var response = new BaseResponse();
 

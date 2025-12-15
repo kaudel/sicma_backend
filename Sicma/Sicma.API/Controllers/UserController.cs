@@ -50,12 +50,12 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> GetUserById(string id)
+        public async Task<IActionResult> GetUserById(Guid id)
         {
             try
             {
@@ -92,11 +92,11 @@ namespace Sicma.API.Controllers
             return response.Success ? Ok(response) : BadRequest(response.Message);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] UserRequest request)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserRequest request)
         {
             var result = await _userService.Update(id, request);
 
@@ -108,11 +108,11 @@ namespace Sicma.API.Controllers
                 return BadRequest(result!.Message);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> DeleteUser(string id)
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
             var result = await _userService.Delete(id);
 
@@ -193,11 +193,11 @@ namespace Sicma.API.Controllers
 
             UserAutenticateResponse userAuth = new()
             {
-                Id = token.Subject
+                Id = Guid.Parse(token.Subject)
             };
 
             //validate refreshtoken
-            var tokenRefreshExists = await _tokenHistoryService.ExistsTokenHistory(tokenRefreshRequest, token.Subject);
+            var tokenRefreshExists = await _tokenHistoryService.ExistsTokenHistory(tokenRefreshRequest, Guid.Parse(token.Subject));
 
             if (tokenRefreshExists == null || !tokenRefreshExists.Success)
                 return Unauthorized("Refresh Token invalid");
@@ -214,7 +214,7 @@ namespace Sicma.API.Controllers
                 ExpiredToken = accessToken.Data!.Token
             };
 
-            var refreshToken = await _tokenHistoryService.CreateRefreshToken(tokenRefreshRequestNew, token.Subject);
+            var refreshToken = await _tokenHistoryService.CreateRefreshToken(tokenRefreshRequestNew, Guid.Parse(token.Subject));
 
             if (refreshToken == null || !refreshToken.Success)
             {
@@ -247,19 +247,20 @@ namespace Sicma.API.Controllers
 
             var tokenhandler = new JwtSecurityTokenHandler();
             var token = tokenhandler.ReadJwtToken(tokenRefreshRequest.ExpiredToken);
+            Guid userId = Guid.Parse(token.Subject);
 
             UserAutenticateResponse userAuth = new()
             {
-                Id = token.Subject
+                Id = userId
             };
 
             //validate refreshtoken
-            var tokenRefreshExists = await _tokenHistoryService.ExistsTokenHistory(tokenRefreshRequest, token.Subject);
+            var tokenRefreshExists = await _tokenHistoryService.ExistsTokenHistory(tokenRefreshRequest,userId);
 
             if (tokenRefreshExists == null || !tokenRefreshExists.Success)
                 return Unauthorized("Refresh Token invalid");
 
-            var isLogout = await _tokenHistoryService.InvalidateToken(tokenRefreshRequest, token.Subject);
+            var isLogout = await _tokenHistoryService.InvalidateToken(tokenRefreshRequest, userId);
 
             if (isLogout == null || !isLogout.Success)
             {

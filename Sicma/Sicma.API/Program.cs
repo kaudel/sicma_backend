@@ -82,7 +82,7 @@ namespace Sicma.API
             });
 
             //configure Identity
-            builder.Services.AddIdentity<AppUser, IdentityRole>(policy =>
+            builder.Services.AddIdentity<AppUser, AppRole>(policy =>
             {
                 policy.Password.RequireDigit = true;
                 policy.Password.RequireLowercase = true;
@@ -90,7 +90,7 @@ namespace Sicma.API
                 policy.Password.RequireNonAlphanumeric = false;
                 policy.User.RequireUniqueEmail = true;
             })
-                .AddRoles<IdentityRole>()
+                .AddRoles<AppRole>()
                 .AddEntityFrameworkStores<DbSicmaContext>();
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();

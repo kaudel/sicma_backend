@@ -14,7 +14,7 @@ namespace Sicma.Repositorys.Implementations
             _dbSicmaContext = context;
         }
 
-        public async Task DeleteRevokeAsync(string tokenId)
+        public async Task DeleteRevokeAsync(Guid tokenId)
         {
             await _dbSicmaContext.TokenHistory
                     .Where(p => p.Id == tokenId)

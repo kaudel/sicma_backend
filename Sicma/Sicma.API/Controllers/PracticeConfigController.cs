@@ -17,7 +17,7 @@ namespace Sicma.API.Controllers
             _pConfigService = practiceConfigService;
         }
 
-        [HttpGet("GetPracticeConfigs")]
+        [HttpGet("GetAll")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -43,12 +43,12 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpGet("GetPracticeConfigById")]
+        [HttpGet("id:guid")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetPracticeConfigById([FromQuery] string request,
+        public async Task<IActionResult> GetPracticeConfigById([FromQuery] Guid request,
             CancellationToken cancellationToken = default)
         {
             try
@@ -86,7 +86,7 @@ namespace Sicma.API.Controllers
             if (practiceConfigRequest == null)
                 return BadRequest(ModelState);
 
-            BaseResponse result = await _pConfigService.Create(practiceConfigRequest, userId!);
+            BaseResponse result = await _pConfigService.Create(practiceConfigRequest, Guid.Parse(userId!));
             if (result.Success)
             {
                 return Created();
@@ -97,17 +97,17 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpDelete("practiceConfigId:string", Name = "DeletePracticeConfig")]
+        [HttpDelete("{id:Guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeletePracticeConfig(string practiceConfigId)
+        public async Task<IActionResult> DeletePracticeConfig(Guid practiceConfigId)
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            if (string.IsNullOrEmpty(practiceConfigId))
+            if (practiceConfigId== Guid.Empty)
                 return BadRequest(ModelState);
 
             BaseResponse result = await _pConfigService.Delete(practiceConfigId);
@@ -128,7 +128,7 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> UpdatePracticeConfig(string id, [FromBody] PracticeConfigRequest practiceConfigRequest,
+        public async Task<IActionResult> UpdatePracticeConfig(Guid id, [FromBody] PracticeConfigRequest practiceConfigRequest,
             CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)

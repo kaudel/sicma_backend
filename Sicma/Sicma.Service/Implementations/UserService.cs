@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Sicma.Common;
-using Sicma.DataAccess.Context;
 using Sicma.DTO.Request.User;
 using Sicma.DTO.Response;
 using Sicma.DTO.Response.Users;
@@ -20,7 +18,7 @@ namespace Sicma.Service.Implementations
         private readonly UserManager<AppUser> _userManager;
 
         public UserService(IUserRepository repo, IMapper mapper, IUnitOfWork uow, 
-            UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+            UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
         {
             _repository = repo;
             _mapper = mapper;
@@ -44,7 +42,7 @@ namespace Sicma.Service.Implementations
                 }
 
                 var user = _mapper.Map<AppUser>(request);
-                user.CreatedUserId = "fcb8ed60-fd02-4ead-8012-efe16b109bb2";
+                user.CreatedUserId = Guid.Parse("fcb8ed60-fd02-4ead-8012-efe16b109bb2");
 
                 IdentityResult result = await _userManager.CreateAsync(user, request.Password);
 
@@ -118,7 +116,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<UserResponse>> GetById(string id)
+        public async Task<BaseResponse<UserResponse>> GetById(Guid id)
         {
             var response = new BaseResponse<UserResponse>();
 
@@ -143,7 +141,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse> Update(string id, UserRequest request)
+        public async Task<BaseResponse> Update(Guid id, UserRequest request)
         {
             var response = new BaseResponse();
 
@@ -170,7 +168,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse> Delete(string id)
+        public async Task<BaseResponse> Delete(Guid id)
         {
             var response = new BaseResponse();
 

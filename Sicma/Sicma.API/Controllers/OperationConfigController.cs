@@ -49,7 +49,7 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOperationConfigsById([FromQuery] string id,
+        public async Task<IActionResult> GetOperationConfigsById([FromQuery] Guid id,
            CancellationToken cancellationToken = default)
         {
             try
@@ -87,7 +87,7 @@ namespace Sicma.API.Controllers
             //var tokenHandler = new JwtSecurityTokenHandler();
             //var token = tokenHandler.ReadToken(request.)
 
-            BaseResponse result = await _operationConfigService.Create(request, userId);
+            BaseResponse result = await _operationConfigService.Create(request, Guid.Parse(userId));
             if (result.Success)
             {
                 return Created();
@@ -98,15 +98,15 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteOperationConfig(string id)
+        public async Task<IActionResult> DeleteOperationConfig(Guid id)
         {
-            if (string.IsNullOrEmpty(id))
+            if (id == Guid.Empty)
                 return BadRequest(ModelState);
 
             BaseResponse result = await _operationConfigService.Delete(id);
@@ -121,12 +121,12 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateOperationConfig(string id, [FromBody] OperationConfigRequest request,
+        public async Task<IActionResult> UpdateOperationConfig(Guid id, [FromBody] OperationConfigRequest request,
             CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)

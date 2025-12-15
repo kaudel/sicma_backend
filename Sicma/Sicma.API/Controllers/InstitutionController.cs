@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sicma.DTO.Request.Institution;
 using Sicma.DTO.Response;
 using Sicma.Service.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Sicma.API.Controllers
 {
@@ -46,14 +44,17 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpGet("GetInstitutionsById")]
+        [HttpGet("{id:Guid}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetInstitutionsById([FromQuery] string request,
+        public async Task<IActionResult> GetInstitutionsById([FromQuery] Guid request,
             CancellationToken cancellationToken = default)
         {
+            if (request == Guid.Empty)
+                return BadRequest(ModelState);
+
             try
             {
                 var result = await _institutionService.GetById(request);
@@ -90,7 +91,7 @@ namespace Sicma.API.Controllers
             if(institutionRequest == null)
                 return BadRequest(ModelState);
 
-            BaseResponse result = await _institutionService.Create(institutionRequest,userId!);
+            BaseResponse result = await _institutionService.Create(institutionRequest,Guid.Parse(userId!));
             if (result.Success)
             {
                 return Created();
@@ -102,17 +103,17 @@ namespace Sicma.API.Controllers
         }
 
 
-        [HttpDelete("institutionId:string", Name = "DeleteInstitution")]
+        [HttpDelete("{id:guid}", Name = "DeleteInstitution")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteInstitution(string institutionId)
+        public async Task<IActionResult> DeleteInstitution(Guid institutionId)
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            if (string.IsNullOrEmpty(institutionId))
+            if (institutionId == Guid.Empty)
                 return BadRequest(ModelState);
 
             BaseResponse result = await _institutionService.Delete(institutionId);
@@ -126,13 +127,13 @@ namespace Sicma.API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:Guid}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> UpdateInstitution(string id,[FromBody] InstitutionRequest institutionRequest,
+        public async Task<IActionResult> UpdateInstitution(Guid id,[FromBody] InstitutionRequest institutionRequest,
             CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)

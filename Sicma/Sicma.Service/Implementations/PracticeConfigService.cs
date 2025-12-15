@@ -20,7 +20,7 @@ namespace Sicma.Service.Implementations
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse> Create(PracticeConfigRequest request, string userId)
+        public async Task<BaseResponse> Create(PracticeConfigRequest request, Guid userId)
         {
             var result = new BaseResponse();
             try
@@ -40,7 +40,7 @@ namespace Sicma.Service.Implementations
             return result;
         }
 
-        public async Task<BaseResponse> Delete(string practiceConfigId)
+        public async Task<BaseResponse> Delete(Guid practiceConfigId)
         {
             var result = new BaseResponse();
             try
@@ -66,7 +66,7 @@ namespace Sicma.Service.Implementations
             return result;
         }
 
-        public async Task<BaseResponse> Update(string id, PracticeConfigRequest request)
+        public async Task<BaseResponse> Update(Guid id, PracticeConfigRequest request)
         {
             var response = new BaseResponse();
 
@@ -122,7 +122,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse<PracticeConfigResponse>> GetById(string id)
+        public async Task<BaseResponse<PracticeConfigResponse>> GetById(Guid id)
         {
             var response = new BaseResponse<PracticeConfigResponse>();
 

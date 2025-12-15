@@ -20,7 +20,7 @@ namespace Sicma.Service.Implementations
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse> Create(OperationConfigRequest request, string userId)
+        public async Task<BaseResponse> Create(OperationConfigRequest request, Guid userId)
         {
             var result = new BaseResponse();
 
@@ -41,7 +41,7 @@ namespace Sicma.Service.Implementations
             return result;
         }
 
-        public async Task<BaseResponse> Delete(string operationConfigId)
+        public async Task<BaseResponse> Delete(Guid operationConfigId)
         {
             var result = new BaseResponse();
 
@@ -97,7 +97,7 @@ namespace Sicma.Service.Implementations
         }
 
 
-        public async Task<BaseResponse<OperationConfigResponse>> GetById(string id)
+        public async Task<BaseResponse<OperationConfigResponse>> GetById(Guid id)
         {
             var response = new BaseResponse<OperationConfigResponse>();
 
@@ -118,7 +118,7 @@ namespace Sicma.Service.Implementations
             return response;
         }
 
-        public async Task<BaseResponse> Update(string id, OperationConfigRequest request)
+        public async Task<BaseResponse> Update(Guid id, OperationConfigRequest request)
         {
             var response = new BaseResponse();
 

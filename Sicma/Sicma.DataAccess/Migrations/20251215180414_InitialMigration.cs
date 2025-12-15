@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Sicma.DataAccess.Migrations
 {
     /// <inheritdoc />
@@ -15,7 +17,7 @@ namespace Sicma.DataAccess.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -29,11 +31,12 @@ namespace Sicma.DataAccess.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -55,19 +58,38 @@ namespace Sicma.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OperationConfigs",
+                name: "Institutions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    OperationName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumElements = table.Column<int>(type: "int", nullable: false),
-                    Digits = table.Column<int>(type: "int", nullable: false),
-                    Range = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedUserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Institutions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OperationConfigs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    OperationName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(600)", maxLength: 600, nullable: false),
+                    TypeSimbol = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
+                    NumElements = table.Column<int>(type: "int", nullable: false),
+                    Digits = table.Column<int>(type: "int", nullable: false),
+                    Range = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    RegexExpression = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    TimePeriodSeconds = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,20 +97,39 @@ namespace Sicma.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PracticeLevels",
+                name: "TokenHistory",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, computedColumnSql: "Case WHEN [ExpirationDate] > GETDATE() THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END"),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedUserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PracticeLevels", x => x.Id);
+                    table.PrimaryKey("PK_TokenHistory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrainingTypes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -97,7 +138,7 @@ namespace Sicma.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -118,7 +159,7 @@ namespace Sicma.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -140,7 +181,7 @@ namespace Sicma.DataAccess.Migrations
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -157,8 +198,8 @@ namespace Sicma.DataAccess.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -181,7 +222,7 @@ namespace Sicma.DataAccess.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -195,6 +236,78 @@ namespace Sicma.DataAccess.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PracticeConfigs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    OperationConfigId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TrainingTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PracticeConfigs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PracticeConfigs_OperationConfigs_OperationConfigId",
+                        column: x => x.OperationConfigId,
+                        principalTable: "OperationConfigs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PracticeConfigs_TrainingTypes_TrainingTypeId",
+                        column: x => x.TrainingTypeId,
+                        principalTable: "TrainingTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Classrooms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    InstitutionId = table.Column<Guid>(type: "uniqueidentifier", maxLength: 50, nullable: false),
+                    PracticeConfigId = table.Column<Guid>(type: "uniqueidentifier", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Classrooms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Classrooms_Institutions_InstitutionId",
+                        column: x => x.InstitutionId,
+                        principalTable: "Institutions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Classrooms_PracticeConfigs_PracticeConfigId",
+                        column: x => x.PracticeConfigId,
+                        principalTable: "PracticeConfigs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "TrainingTypes",
+                columns: new[] { "Id", "CreatedDate", "CreatedUserId", "Description", "IsActive", "Name", "UpdatedDate" },
+                values: new object[,]
+                {
+                    { new Guid("0af6fbbc-4388-4c4d-a7e0-dff5900b45ca"), new DateTime(2025, 12, 10, 7, 45, 12, 665, DateTimeKind.Utc).AddTicks(4318), new Guid("b7c6a2e4-1d6f-4a9c-9b3c-9d5d91c5a111"), "Opcion entrenamiento", true, "Entrenamiento", null },
+                    { new Guid("28c52fce-4774-4a1b-8d7c-ff98dd43ff19"), new DateTime(2025, 12, 10, 7, 45, 12, 665, DateTimeKind.Utc).AddTicks(1971), new Guid("b7c6a2e4-1d6f-4a9c-9b3c-9d5d91c5a111"), "Opcion torneo", true, "Torneo", null },
+                    { new Guid("78cfc855-13be-4eb3-9d42-bff6c402f479"), new DateTime(2025, 12, 10, 7, 45, 12, 665, DateTimeKind.Utc).AddTicks(4325), new Guid("b7c6a2e4-1d6f-4a9c-9b3c-9d5d91c5a111"), "Opcion 1 contra 1", true, "1vs1", null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -235,6 +348,30 @@ namespace Sicma.DataAccess.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classrooms_InstitutionId",
+                table: "Classrooms",
+                column: "InstitutionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classrooms_PracticeConfigId",
+                table: "Classrooms",
+                column: "PracticeConfigId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PracticeConfigs_OperationConfigId",
+                table: "PracticeConfigs",
+                column: "OperationConfigId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PracticeConfigs_TrainingTypeId",
+                table: "PracticeConfigs",
+                column: "TrainingTypeId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -256,16 +393,28 @@ namespace Sicma.DataAccess.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "OperationConfigs");
+                name: "Classrooms");
 
             migrationBuilder.DropTable(
-                name: "PracticeLevels");
+                name: "TokenHistory");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Institutions");
+
+            migrationBuilder.DropTable(
+                name: "PracticeConfigs");
+
+            migrationBuilder.DropTable(
+                name: "OperationConfigs");
+
+            migrationBuilder.DropTable(
+                name: "TrainingTypes");
         }
     }
 }

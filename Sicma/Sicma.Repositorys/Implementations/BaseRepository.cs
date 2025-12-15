@@ -67,7 +67,7 @@ namespace Sicma.Repositorys.Implementations
         }
 
 
-        public async Task<TEntity?> FindByIdAsync(string id)
+        public async Task<TEntity?> FindByIdAsync(Guid id)
         {
             return await dbSicmaContext.Set<TEntity>().FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
         }
@@ -84,7 +84,7 @@ namespace Sicma.Repositorys.Implementations
             await dbSicmaContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(Guid id)
         {
             await dbSicmaContext.Set<TEntity>()
                   .Where(p => p.Id == id)

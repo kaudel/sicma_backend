@@ -2,7 +2,7 @@
 {
     public interface IBaseEntity
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public bool IsActive { get; set; }
 
@@ -10,6 +10,6 @@
 
         public DateTime? UpdatedDate { get; set; }
 
-        public string CreatedUserId { get; set; }
+        public Guid CreatedUserId { get; set; }
     }
 }
