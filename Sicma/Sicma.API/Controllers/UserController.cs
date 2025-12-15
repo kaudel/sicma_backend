@@ -25,7 +25,7 @@ namespace Sicma.API.Controllers
             _tokenHistoryService = tokenHistoryService;
         }
 
-
+        [Authorize]
         [HttpGet("GetAll")]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -50,6 +50,7 @@ namespace Sicma.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -92,6 +93,7 @@ namespace Sicma.API.Controllers
             return response.Success ? Ok(response) : BadRequest(response.Message);
         }
 
+        [Authorize]
         [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -108,6 +110,7 @@ namespace Sicma.API.Controllers
                 return BadRequest(result!.Message);
         }
 
+        [Authorize]
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

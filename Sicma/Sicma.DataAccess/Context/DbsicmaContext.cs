@@ -26,6 +26,7 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser, AppRole, Guid>
 
     public virtual DbSet<Classroom> Classrooms { get; set; }
 
+    public virtual DbSet<UserRecord> UserRecords { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +60,9 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser, AppRole, Guid>
             .Property(x => x.Id)
             .HasDefaultValueSql("NEWSEQUENTIALID()");
 
+        modelBuilder.Entity<UserRecord>()
+            .Property(x => x.Id)
+            .HasDefaultValueSql("NEWSEQUENTIALID()");
 
 
         modelBuilder.Entity<PracticeConfig>()
@@ -85,6 +89,16 @@ public partial class DbSicmaContext : IdentityDbContext<AppUser, AppRole, Guid>
             .HasOne(p => p.PracticeConfig)
             .WithOne()
             .HasForeignKey<Classroom>(p => p.PracticeConfigId);
+
+        modelBuilder.Entity<UserRecord>()
+            .HasOne(p => p.AppUser)
+            .WithOne()
+            .HasForeignKey<UserRecord>(p => p.UserId);
+
+        modelBuilder.Entity<UserRecord>()
+            .HasOne(p => p.PracticeConfig)
+            .WithOne()
+            .HasForeignKey<UserRecord>(p => p.PracticeConfigId);
 
         modelBuilder.Entity<TrainingType>().HasData(
     new TrainingType

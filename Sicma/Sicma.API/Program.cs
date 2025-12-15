@@ -2,7 +2,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -99,6 +98,7 @@ namespace Sicma.API
             builder.Services.AddScoped<ITokenHistoryRepository, TokenHistoryRepository>();
             builder.Services.AddScoped<IPracticeConfigRepository, PracticeConfigRepository>();
             builder.Services.AddScoped<IClassroomRepository, ClassroomRepository>();
+            builder.Services.AddScoped<IUserRecordRepository, UserRecordRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IInstitutionService, InstitutionService>();
@@ -106,6 +106,7 @@ namespace Sicma.API
             builder.Services.AddScoped<ITokenHistoryService, TokenHistoryService>();
             builder.Services.AddScoped<IPracticeConfigService, PracticeConfigService>();
             builder.Services.AddScoped<IClassroomService, ClassroomService>();
+            builder.Services.AddScoped<IUserRecordService, UserRecordService>();
 
             builder.Services.AddAutoMapper(p =>
             {
@@ -115,6 +116,7 @@ namespace Sicma.API
                 p.AddProfile<TokenHistoryMap>();
                 p.AddProfile<PracticeConfigMap>();
                 p.AddProfile<ClassroomMap>();
+                p.AddProfile<UserRecordMap>();
             });
 
             //Add access to configuration
