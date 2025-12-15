@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Sicma.DTO.Request.PracticeConfig;
+using Sicma.DTO.Request.Classroom;
 using Sicma.DTO.Response;
 using Sicma.Service.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,13 +8,13 @@ namespace Sicma.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PracticeConfigController : ControllerBase
+    public class ClassroomController : ControllerBase
     {
-        public readonly IPracticeConfigService _pConfigService;
+        public readonly IClassroomService _classroomService;
 
-        public PracticeConfigController(IPracticeConfigService practiceConfigService)
+        public ClassroomController( IClassroomService classroomService)
         {
-            _pConfigService = practiceConfigService;
+            _classroomService = classroomService;
         }
 
         [HttpGet("GetAll")]
@@ -22,12 +22,12 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetPracticeConfigs([FromQuery] PracticeConfigSearchRequest request,
+        public async Task<IActionResult> GetClassrooms([FromQuery] ClassroomSearchRequest request,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _pConfigService.GetAll(request);
+                var result = await _classroomService.GetAll(request);
                 if (result != null && result.Success)
                 {
                     return Ok(result);
@@ -48,12 +48,12 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetPracticeConfigById([FromQuery] Guid request,
+        public async Task<IActionResult> GetClassroomById([FromQuery] Guid request,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _pConfigService.GetById(request);
+                var result = await _classroomService.GetById(request);
                 if (result != null && result.Success)
                 {
                     return Ok(result);
@@ -75,7 +75,7 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> CreateInstitution([FromBody] PracticeConfigRequest practiceConfigRequest,
+        public async Task<IActionResult> CreateClassroom([FromBody] ClassroomRequest classroomRequest,
             CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
@@ -83,10 +83,10 @@ namespace Sicma.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (practiceConfigRequest == null)
+            if (classroomRequest == null)
                 return BadRequest(ModelState);
 
-            BaseResponse result = await _pConfigService.Create(practiceConfigRequest, Guid.Parse(userId!));
+            BaseResponse result = await _classroomService.Create(classroomRequest, Guid.Parse(userId!));
             if (result.Success)
             {
                 return Created();
@@ -103,14 +103,14 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeletePracticeConfig(Guid practiceConfigId)
+        public async Task<IActionResult> DeleteClassroom(Guid classroomId)
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            if (practiceConfigId== Guid.Empty)
+            if (classroomId == Guid.Empty)
                 return BadRequest(ModelState);
 
-            BaseResponse result = await _pConfigService.Delete(practiceConfigId);
+            BaseResponse result = await _classroomService.Delete(classroomId);
 
             if (result.Success)
             {
@@ -128,18 +128,18 @@ namespace Sicma.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> UpdatePracticeConfig(Guid id, [FromBody] PracticeConfigRequest practiceConfigRequest,
+        public async Task<IActionResult> UpdateClassroom(Guid id, [FromBody] ClassroomRequest classroomRequest,
             CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (practiceConfigRequest == null)
+            if (classroomRequest == null)
                 return BadRequest(ModelState);
 
             var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            BaseResponse result = await _pConfigService.Update(id, practiceConfigRequest);
+            BaseResponse result = await _classroomService.Update(id, classroomRequest);
             if (result.Success)
             {
                 return Created();

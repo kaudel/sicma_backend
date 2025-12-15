@@ -98,12 +98,14 @@ namespace Sicma.API
             builder.Services.AddScoped<IOperationConfigRepository, OperationConfigRepository>();
             builder.Services.AddScoped<ITokenHistoryRepository, TokenHistoryRepository>();
             builder.Services.AddScoped<IPracticeConfigRepository, PracticeConfigRepository>();
+            builder.Services.AddScoped<IClassroomRepository, ClassroomRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IInstitutionService, InstitutionService>();
             builder.Services.AddScoped<IOperationConfigService, OperationConfigService>();
             builder.Services.AddScoped<ITokenHistoryService, TokenHistoryService>();
             builder.Services.AddScoped<IPracticeConfigService, PracticeConfigService>();
+            builder.Services.AddScoped<IClassroomService, ClassroomService>();
 
             builder.Services.AddAutoMapper(p =>
             {
@@ -112,6 +114,7 @@ namespace Sicma.API
                 p.AddProfile<OperationConfigMap>();
                 p.AddProfile<TokenHistoryMap>();
                 p.AddProfile<PracticeConfigMap>();
+                p.AddProfile<ClassroomMap>();
             });
 
             //Add access to configuration
